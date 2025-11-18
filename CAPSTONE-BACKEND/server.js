@@ -8,7 +8,7 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['http://localhost:3000'], // Izinkan frontend Anda
+        origin: ['http://localhost:3000'],
       },
     },
   });
@@ -19,7 +19,7 @@ const init = async () => {
     require('./src/api/leads')
   ], {
     routes: {
-      prefix: '/api' // Semua rute akan diawali dengan /api
+      prefix: '/api' 
     }
   });
 
@@ -31,5 +31,6 @@ process.on('unhandledRejection', (err) => {
   console.log(err);
   process.exit(1);
 });
+
 
 init();
