@@ -30,7 +30,7 @@ interface DetailPageProps {
   onBack: () => void;
 }
 
-// Definisikan alamat API
+
 const API_URL = 'http://localhost:5000/api';
 
 export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
@@ -65,7 +65,7 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
   const handleStatusChange = async (newStatus: Lead['status']) => {
     if (!lead) return;
 
-    // Optimistic update
+ 
     const oldLead = lead;
     setLead({ ...lead, status: newStatus });
 
