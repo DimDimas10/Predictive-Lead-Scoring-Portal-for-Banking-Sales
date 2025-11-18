@@ -59,12 +59,10 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
       setIsLoading(false);
     }
   };
-
-  // Filter dan Sort (Tidak berubah)
+  
   useEffect(() => {
     let result = [...leads];
 
-    // Filter by search
     if (searchTerm) {
       result = result.filter(
         (lead) =>
@@ -79,7 +77,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
       result = result.filter((lead) => lead.status === statusFilter);
     }
 
-    // Sort
+    
     result.sort((a, b) => {
       let compareValue = 0;
 
@@ -102,7 +100,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
   }, [leads, searchTerm, statusFilter, sortBy, sortOrder]);
 
   const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
-    // Optimistic update
+  
     const oldLeads = [...leads];
     const newLeads = leads.map((lead) => 
       (lead.id === leadId ? { ...lead, status: newStatus, contactedAt: new Date() } : lead)
@@ -117,7 +115,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
         },
         body: JSON.stringify({ status: newStatus }),
       });
-      // Jika berhasil, state sudah ter-update
+    
     } catch (err) {
       console.error('Gagal update status:', err);
       // Rollback jika gagal
@@ -160,7 +158,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     }).format(amount);
   };
 
-  // Metrics (Tidak berubah)
+
   const totalLeads = leads.length;
   const highPriorityLeads = leads.filter((l) => l.predictedScore >= 0.7 && l.status === 'pending').length;
   const contacted = leads.filter(
