@@ -25,7 +25,6 @@ interface DashboardPageProps {
   onViewDetail: (leadId: string) => void;
 }
 
-// Definisikan alamat API
 const API_URL = 'http://localhost:5000/api';
 
 export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPageProps) {
