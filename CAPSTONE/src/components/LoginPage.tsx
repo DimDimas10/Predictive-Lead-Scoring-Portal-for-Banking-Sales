@@ -10,7 +10,6 @@ interface LoginPageProps {
   onLogin: (user: User) => void;
 }
 
-// Definisikan alamat API
 const API_URL = 'http://localhost:5000/api';
 
 export function LoginPage({ onLogin }: LoginPageProps) {
