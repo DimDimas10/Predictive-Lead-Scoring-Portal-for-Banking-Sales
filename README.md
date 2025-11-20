@@ -8,7 +8,16 @@
 - Untuk sementara BE kita sengaja kita pakai data tiruan dahulu(mock data)
 - untuk data si usernya kita ambil langsung di folder BE/src/data/users.js dan untuk si nasabahnya di ../leads.js
 - untuk proses ini kami(REBE) buat sementara karena gua(adjie) butuh buat skema ui untuk detail page-nya
-
+- Model ML sudah selesai dilatih menggunakan beberapa algoritma:
+1. Logistic Regression
+2. Random Forest
+3. Gradient Boosting
+4. SVM (RBF)
+Setelah evaluasi, model GradientBoostingClassifier menjadi kandidat terbaik (AUC tertinggi).
+- preprocessing dan model sudah digabung menggunakan pipeline.
+- model disimpan dalam format .pkl yang akan dijalankan menggunakan file python
+- membuat file python untuk menjalankan model yang sudah disimpan, kemudian output modelnya disimpan dalam format .json untuk panggil backend (nodejs)
+  
 ## Next step
 - kita bakal mindahin data(bila sudah ready) dari file users.js dan leads.js ke DB-nya
 - kita(REBE) refactor lagi BE nya,utamanya kita perbarui lagi tuh handler.js nya ke DB-nya(kalau implementasi DBnya sudah ready)
