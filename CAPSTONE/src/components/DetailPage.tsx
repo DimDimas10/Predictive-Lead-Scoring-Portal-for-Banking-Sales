@@ -20,6 +20,7 @@ import {
   XCircle,
   MessageSquare,
   Activity,
+  RefreshCw,
   Save // Import Save icon
 } from 'lucide-react';
 import type { User as AppUser, Lead } from '../App';
@@ -62,25 +63,36 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
     fetchLeadDetail();
   }, [leadId]);
 
-  const handleStatusChange = async (newStatus: Lead['status']) => {
-    if (!lead) return;
+ const handleStatusChange = async (newStatus: Lead['status']) => {
+  if (!lead) return;
 
- 
-    const oldLead = lead;
-    setLead({ ...lead, status: newStatus });
+  const oldLead = lead;
+  // optimistic update di UI
+  setLead({ ...lead, status: newStatus });
 
-    try {
-      await fetch(`${API_URL}/leads/${lead.id}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-    } catch (err) {
-      console.error('Gagal update status:', err);
-      setLead(oldLead); // Rollback
-      alert('Gagal memperbarui status.');
+  try {
+    const res = await fetch(`${API_URL}/leads/${lead.id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        status: newStatus,
+        userId: String(user.id),   // 🔥 penting: kirim userId ke backend
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.message || `Gagal update status lead (${res.status})`);
     }
-  };
+
+
+  } catch (err) {
+    console.error('Gagal update status:', err);
+    setLead(oldLead); // rollback state
+    alert(err instanceof Error ? err.message : 'Gagal memperbarui status.');
+  }
+};
+
 
   const handleSaveNotes = async () => {
     if (!lead) return;
@@ -145,6 +157,104 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
       minimumFractionDigits: 0
     }).format(amount);
   };
+    const formatYesNo = (val?: string | null) => {
+    if (!val) return '-';
+    if (val.toLowerCase() === 'yes') return 'Ya';
+    if (val.toLowerCase() === 'no') return 'Tidak';
+    return val;
+  };
+
+  const formatMarital = (val?: string | null) => {
+    if (!val) return '-';
+    switch (val.toLowerCase()) {
+      case 'married':
+        return 'Menikah';
+      case 'single':
+        return 'Lajang';
+      case 'divorced':
+        return 'Cerai';
+      default:
+        return val;
+    }
+  };
+
+  const formatEducation = (val?: string | null) => {
+    if (!val) return '-';
+    switch (val.toLowerCase()) {
+      case 'primary':
+        return 'Pendidikan dasar';
+      case 'secondary':
+        return 'Pendidikan menengah';
+      case 'tertiary':
+        return 'Pendidikan tinggi';
+      case 'unknown':
+        return 'Tidak diketahui';
+      default:
+        return val;
+    }
+  };
+
+  const formatContactType = (val?: string | null) => {
+    if (!val) return '-';
+    switch (val.toLowerCase()) {
+      case 'cellular':
+        return 'Ponsel';
+      case 'telephone':
+        return 'Telepon rumah/kantor';
+      default:
+        return val;
+    }
+  };
+
+  const formatMonth = (val?: string | null) => {
+    if (!val) return '-';
+    const m = val.toLowerCase();
+    const map: Record<string, string> = {
+      jan: 'Jan',
+      feb: 'Feb',
+      mar: 'Mar',
+      apr: 'Apr',
+      may: 'Mei',
+      jun: 'Jun',
+      jul: 'Jul',
+      aug: 'Agu',
+      sep: 'Sep',
+      oct: 'Okt',
+      nov: 'Nov',
+      dec: 'Des',
+    };
+    return map[m] || val;
+  };
+
+  const formatDayOfWeek = (val?: string | null) => {
+    if (!val) return '-';
+    const d = val.toLowerCase();
+    const map: Record<string, string> = {
+      mon: 'Senin',
+      tue: 'Selasa',
+      wed: 'Rabu',
+      thu: 'Kamis',
+      fri: 'Jumat',
+    };
+    return map[d] || val;
+  };
+
+  const formatPoutcome = (val?: string | null) => {
+    if (!val) return '-';
+    switch (val.toLowerCase()) {
+      case 'success':
+        return 'Berhasil';
+      case 'failure':
+        return 'Gagal';
+      case 'other':
+        return 'Lainnya';
+      case 'nonexistent':
+        return 'Tidak ada';
+      default:
+        return val;
+    }
+  };
+
 
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'bg-green-100 text-green-800 border-green-300';
@@ -282,13 +392,15 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
               <CardHeader>
                 <CardTitle className="text-gray-900">Informasi Tambahan</CardTitle>
               </CardHeader>
-              <CardContent>
+             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex items-start gap-3">
                     <Home className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Kepemilikan Rumah</p>
-                      <p className="text-gray-900">{lead.housing === 'yes' ? 'Ya' : 'Tidak'}</p>
+                      <p className="text-gray-900">
+                        {formatYesNo(lead.housing)}
+                      </p>
                     </div>
                   </div>
 
@@ -296,7 +408,9 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
                     <CreditCard className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Pinjaman Aktif</p>
-                      <p className="text-gray-900">{lead.loan === 'yes' ? 'Ya' : 'Tidak'}</p>
+                      <p className="text-gray-900">
+                        {formatYesNo(lead.loan)}
+                      </p>
                     </div>
                   </div>
 
@@ -304,7 +418,11 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
                     <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Kontak Terakhir</p>
-                      <p className="text-gray-900">{new Date(lead.lastContact).toLocaleDateString('id-ID')}</p>
+                      <p className="text-gray-900">
+                        {lead.contactedAt
+                          ? new Date(lead.contactedAt).toLocaleString('id-ID')
+                          : '-'}
+                      </p>
                     </div>
                   </div>
 
@@ -312,7 +430,9 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
                     <Target className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Kampanye Ke-</p>
-                      <p className="text-gray-900">{lead.campaign}</p>
+                      <p className="text-gray-900">
+                        {lead.campaign ?? '-'}
+                      </p>
                     </div>
                   </div>
 
@@ -320,7 +440,9 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
                     <Activity className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Status Pernikahan</p>
-                      <p className="text-gray-900 capitalize">{lead.marital}</p>
+                      <p className="text-gray-900">
+                        {formatMarital(lead.marital)}
+                      </p>
                     </div>
                   </div>
 
@@ -328,11 +450,37 @@ export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
                     <CheckCircle2 className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-500">Hasil Kampanye Sebelumnya</p>
-                      <p className="text-gray-900 capitalize">{lead.previousOutcome}</p>
+                      <p className="text-gray-900">
+                        {formatPoutcome(lead.previousOutcome)}
+                      </p>
                     </div>
                   </div>
+
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-gray-500">Media Kontak</p>
+                      <p className="text-gray-900">
+                        {formatContactType(lead.contact)}
+                      </p>
+                    </div>
+                  </div>
+
+                {user.role === 'admin' && (
+                  <div className="flex items-start gap-3 mt-4">
+                    <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-gray-500">Dihubungi oleh</p>
+                      <p className="text-gray-900">
+                        {lead.contactedByName || 'Belum pernah dihubungi oleh sales'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 </div>
               </CardContent>
+
             </Card>
 
             {/* Notes */}

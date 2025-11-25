@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LoginPage } from './components/LoginPage';
 import { DashboardPage } from './components/DashboardPage';
 import { DetailPage } from './components/DetailPage';
+import { AdminUserPage } from './components/AdminUserPage';
 
 export interface Lead {
   id: string;
@@ -13,7 +14,7 @@ export interface Lead {
   balance: number;
   phone: string;
   email: string;
-  lastContact: string;
+  contact?: string;
   campaign: number;
   previousOutcome: string;
   predictedScore: number;
@@ -22,6 +23,9 @@ export interface Lead {
   notes?: string;
   housing: string;
   loan: string;
+
+  userId?: string;
+  contactedByName?: string;
 }
 
 export interface User {
@@ -31,7 +35,8 @@ export interface User {
   role: string;
 }
 
-type Page = 'login' | 'dashboard' | 'detail';
+type Page = 'login' | 'dashboard' | 'detail' | 'adminUsers';
+
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('login');
@@ -58,27 +63,41 @@ export default function App() {
     setSelectedLeadId(null);
   };
 
+  const handleOpenAdminUsers = () => {
+  setCurrentPage('adminUsers');
+};
+
   return (
-    <>
-      {currentPage === 'login' && (
-        <LoginPage onLogin={handleLogin} />
-      )}
-      
-      {currentPage === 'dashboard' && user && (
-        <DashboardPage 
-          user={user}
-          onLogout={handleLogout}
-          onViewDetail={handleViewDetail}
-        />
-      )}
-      
-      {currentPage === 'detail' && user && selectedLeadId && (
-        <DetailPage 
-          leadId={selectedLeadId}
-          user={user}
-          onBack={handleBackToDashboard}
-        />
-      )}
-    </>
-  );
+  <>
+    {currentPage === 'login' && (
+      <LoginPage onLogin={handleLogin} />
+    )}
+    
+    {currentPage === 'dashboard' && user && (
+      <DashboardPage 
+        user={user}
+        onLogout={handleLogout}
+        onViewDetail={handleViewDetail}
+        onOpenAdminUsers={handleOpenAdminUsers} 
+      />
+    )}
+    
+    {currentPage === 'detail' && user && selectedLeadId && (
+      <DetailPage 
+        leadId={selectedLeadId}
+        user={user}
+        onBack={handleBackToDashboard}
+      />
+    )}
+
+    {currentPage === 'adminUsers' && user && (
+      <AdminUserPage
+        user={user}
+        onLogout={handleLogout}
+        onBackToDashboard={handleBackToDashboard}
+      />
+    )}
+  </>
+);
+
 }
