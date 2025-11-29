@@ -8,12 +8,13 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['http://localhost:3000'],
+        origin: ['*'], 
+        additionalHeaders: ['cache-control', 'x-requested-with']
       },
     },
   });
 
-  // Daftarkan modul API sebagai plugin
+  // Pastikan folder src/api/users dan src/api/leads ada dan memiliki index.js
   await server.register([
     require('./src/api/users'),
     require('./src/api/leads')
@@ -31,6 +32,5 @@ process.on('unhandledRejection', (err) => {
   console.log(err);
   process.exit(1);
 });
-
 
 init();

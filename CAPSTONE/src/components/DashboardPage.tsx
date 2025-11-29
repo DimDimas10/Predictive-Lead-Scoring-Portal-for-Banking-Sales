@@ -1,33 +1,44 @@
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Eye,
-  LogOut,
-  Phone,
-  RefreshCw,
-  Search,
-  Target,
-  TrendingUp,
-  Users
-} from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import type { Lead, User } from '../App';
-import { Badge } from './ui/badge';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { 
+  LogOut, 
+  Search, 
+  TrendingUp, 
+  Users, 
+  Phone, 
+  Target,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  RefreshCw,
+  Settings
+} from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import type { User, Lead } from '../App';
 
 interface DashboardPageProps {
   user: User;
   onLogout: () => void;
   onViewDetail: (leadId: string) => void;
+  onNavigateToAdmin?: () => void;
+  onOpenAdminUsers?: () => void;
 }
 
 const API_URL = 'http://localhost:5000/api';
+const PAGE_SIZE = 20;
 
-export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPageProps) {
+export function DashboardPage({ 
+  user, 
+  onLogout, 
+  onViewDetail, 
+  onNavigateToAdmin,
+  onOpenAdminUsers
+}: DashboardPageProps) {
+  
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,52 +46,75 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
   const [sortBy, setSortBy] = useState<'score' | 'name' | 'balance'>('score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(''); // State untuk error fetching
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Ambil data real dari backend
   useEffect(() => {
-    fetchLeadsWithMLScores();
+    fetchLeads();
   }, []);
 
-  const fetchLeadsWithMLScores = async () => {
+  const fetchLeads = async () => {
     setIsLoading(true);
-    setError(''); // Reset error
-
+    setError('');
     try {
-      const response = await fetch(`${API_URL}/leads`);
+      const response = await fetch(
+        `${API_URL}/leads?userId=${encodeURIComponent(user.id)}&role=${encodeURIComponent(user.role)}`
+      );
       if (!response.ok) {
         throw new Error('Gagal mengambil data leads');
       }
       const data: Lead[] = await response.json();
       setLeads(data);
       setFilteredLeads(data);
+      setCurrentPage(1);
     } catch (err: any) {
+      console.error(err);
       setError(err.message || 'Terjadi kesalahan saat memuat data.');
     } finally {
       setIsLoading(false);
     }
   };
-  
+
+  const refreshLeadsWithMLScores = async () => {
+    document.body.style.pointerEvents = '';
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_URL}/leads/refresh-ml`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Gagal refresh skor ML');
+      }
+      await fetchLeads();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Terjadi kesalahan saat refresh skor ML.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Filter dan Sort logic
   useEffect(() => {
     let result = [...leads];
 
     if (searchTerm) {
-      result = result.filter(
-        (lead) =>
-          lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lead.phone.includes(searchTerm)
+      result = result.filter(lead => 
+        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        lead.phone.includes(searchTerm)
       );
     }
 
-    // Filter by status
     if (statusFilter !== 'all') {
-      result = result.filter((lead) => lead.status === statusFilter);
+      result = result.filter(lead => lead.status === statusFilter);
     }
 
-    
     result.sort((a, b) => {
       let compareValue = 0;
-
+      
       switch (sortBy) {
         case 'score':
           compareValue = a.predictedScore - b.predictedScore;
@@ -97,29 +131,34 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     });
 
     setFilteredLeads(result);
+    setCurrentPage(1);
   }, [leads, searchTerm, statusFilter, sortBy, sortOrder]);
 
+  // Update Status Logic (Real fetch)
   const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
-  
-    const oldLeads = [...leads];
-    const newLeads = leads.map((lead) => 
-      (lead.id === leadId ? { ...lead, status: newStatus, contactedAt: new Date() } : lead)
-    );
-    setLeads(newLeads);
+    if (user.role === 'admin') return;
+    const prevLeads = [...leads];
+    
+    // Optimistic Update
+    setLeads(leads.map((lead) =>
+      lead.id === leadId ? { ...lead, status: newStatus } : lead
+    ));
 
     try {
-      await fetch(`${API_URL}/leads/${leadId}/status`, {
+      const res = await fetch(`${API_URL}/leads/${leadId}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          status: newStatus,
+          userId: String(user.id),  
+        }),
       });
-    
-    } catch (err) {
+
+      if (!res.ok) throw new Error('Gagal update status');
+      
+    } catch (err: any) {
       console.error('Gagal update status:', err);
-      // Rollback jika gagal
-      setLeads(oldLeads);
+      setLeads(prevLeads); // Rollback
       alert('Gagal memperbarui status. Silakan coba lagi.');
     }
   };
@@ -158,23 +197,24 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     }).format(amount);
   };
 
-
+  // Metrics
   const totalLeads = leads.length;
-  const highPriorityLeads = leads.filter((l) => l.predictedScore >= 0.7 && l.status === 'pending').length;
-  const contacted = leads.filter(
-    (l) => l.status === 'contacted' || l.status === 'converted' || l.status === 'rejected'
-  ).length;
-  const converted = leads.filter((l) => l.status === 'converted').length;
+  const highPriorityLeads = leads.filter(l => Math.round(l.predictedScore * 100) >= 70 && l.status === 'pending').length;
+  const contacted = leads.filter(l => l.status === 'contacted' || l.status === 'converted' || l.status === 'rejected').length;
+  const converted = leads.filter(l => l.status === 'converted').length;
   const conversionRate = contacted > 0 ? (converted / contacted) * 100 : 0;
 
   const SortIcon = ({ field }: { field: 'score' | 'name' | 'balance' }) => {
     if (sortBy !== field) return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
-    return sortOrder === 'asc' ? (
-      <ArrowUp className="w-4 h-4 text-blue-600" />
-    ) : (
-      <ArrowDown className="w-4 h-4 text-blue-600" />
-    );
+    return sortOrder === 'asc' 
+      ? <ArrowUp className="w-4 h-4 text-blue-600" />
+      : <ArrowDown className="w-4 h-4 text-blue-600" />;
   };
+  
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredLeads.length / PAGE_SIZE));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const paginatedLeads = filteredLeads.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -196,6 +236,23 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                 <p className="text-gray-900">{user.name}</p>
                 <p className="text-gray-500">{user.role}</p>
               </div>
+              
+              {user.role === 'admin' && (
+                <>
+                  {onOpenAdminUsers && (
+                    <Button variant="outline" onClick={onOpenAdminUsers}>
+                       Admin User
+                    </Button>
+                  )}
+                  {onNavigateToAdmin && (
+                    <Button variant="outline" onClick={onNavigateToAdmin}>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Kelola Data
+                    </Button>
+                  )}
+                </>
+              )}
+              
               <Button variant="outline" onClick={onLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -237,9 +294,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
             </CardHeader>
             <CardContent>
               <div className="text-gray-900">{conversionRate.toFixed(1)}%</div>
-              <p className="text-gray-500">
-                {converted} dari {contacted} kontak
-              </p>
+              <p className="text-gray-500">{converted} dari {contacted} kontak</p>
             </CardContent>
           </Card>
 
@@ -287,9 +342,14 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={fetchLeadsWithMLScores} className="flex-1" disabled={isLoading}>
+                <Button
+                  variant="outline"
+                  onClick={() => refreshLeadsWithMLScores()}
+                  disabled={isLoading}
+                  className="flex-1"
+                >
                   <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  {isLoading ? 'Memuat...' : 'Refresh Skor ML'}
+                  Refresh Skor ML
                 </Button>
               </div>
             </div>
@@ -300,11 +360,10 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-gray-900">Daftar Nasabah Potensial ({filteredLeads.length})</CardTitle>
-              <p className="text-gray-600">
-                {sortBy === 'score' ? 'Diurutkan berdasarkan skor ML' : 
-                 sortBy === 'name' ? 'Diurutkan berdasarkan nama' : 'Diurutkan berdasarkan saldo'}
-              </p>
+              <CardTitle className="text-gray-900">
+                Daftar Nasabah Potensial ({filteredLeads.length})
+              </CardTitle>
+              <p className="text-gray-600">Diurutkan berdasarkan skor ML</p>
             </div>
           </CardHeader>
           <CardContent>
@@ -318,6 +377,7 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                 <p>{error}</p>
               </div>
             ) : (
+              <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
@@ -356,41 +416,46 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filteredLeads.map((lead, index) => (
+                    {paginatedLeads.map((lead, index) => (
                       <tr key={lead.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-4 text-gray-700">{index + 1}</td>
+                        <td className="px-4 py-4 text-gray-700">{startIndex + index + 1}</td>
                         <td className="px-4 py-4">
                           <div>
                             <div className="text-gray-900">{lead.name}</div>
-                            <div className="text-gray-500">
-                              {lead.age} tahun • {lead.job}
-                            </div>
+                            <div className="text-gray-500">{lead.age} tahun • {lead.job}</div>
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <div className="text-gray-700">{lead.phone}</div>
                           <div className="text-gray-500">{lead.email}</div>
                         </td>
-                        <td className="px-4 py-4 text-gray-900">{formatCurrency(lead.balance)}</td>
+                        <td className="px-4 py-4 text-gray-900">
+                          {formatCurrency(lead.balance)}
+                        </td>
                         <td className="px-4 py-4 text-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1 rounded-full border ${getScoreColor(
-                              lead.predictedScore
-                            )}`}
-                          >
+                          <div className={`inline-flex items-center px-3 py-1 rounded-full border ${getScoreColor(lead.predictedScore)}`}>
                             {(lead.predictedScore * 100).toFixed(0)}%
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-center">{getStatusBadge(lead.status)}</td>
+                        <td className="px-4 py-4 text-center">
+                          {getStatusBadge(lead.status)}
+                        </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            {lead.status === 'pending' && (
-                              <Button size="sm" onClick={() => handleStatusChange(lead.id, 'contacted')}>
+                            {lead.status === 'pending' && user.role !== 'admin' && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleStatusChange(lead.id, 'contacted')}
+                              >
                                 <Phone className="w-4 h-4 mr-1" />
                                 Hubungi
                               </Button>
                             )}
-                            <Button size="sm" variant="outline" onClick={() => onViewDetail(lead.id)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onViewDetail(lead.id)}
+                            >
                               <Eye className="w-4 h-4 mr-1" />
                               Detail
                             </Button>
@@ -407,6 +472,36 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                   </div>
                 )}
               </div>
+              
+              {filteredLeads.length > 0 && (
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="text-gray-600 text-sm">
+                      Menampilkan {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, filteredLeads.length)} dari {filteredLeads.length} nasabah
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Sebelumnya
+                      </Button>
+                      <span className="text-gray-700 text-sm">
+                        Halaman {currentPage} dari {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Selanjutnya
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

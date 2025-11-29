@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LoginPage } from './components/LoginPage';
 import { DashboardPage } from './components/DashboardPage';
 import { DetailPage } from './components/DetailPage';
+import { AdminManagementPage } from './components/AdminManagementPage';
+import { AdminUserPage } from './components/AdminUserPage';
 
 export interface Lead {
   id: string;
@@ -13,15 +15,21 @@ export interface Lead {
   balance: number;
   phone: string;
   email: string;
-  lastContact: string;
+  
+  // Field dari Backend
+  contact?: string;
   campaign: number;
   previousOutcome: string;
   predictedScore: number;
   status: 'pending' | 'contacted' | 'converted' | 'rejected';
-  contactedAt?: Date;
+  contactedAt?: string; // Backend mengirim string ISO date
   notes?: string;
   housing: string;
   loan: string;
+  
+  // Opsional (untuk UI)
+  userId?: string;
+  contactedByName?: string;
 }
 
 export interface User {
@@ -31,7 +39,7 @@ export interface User {
   role: string;
 }
 
-type Page = 'login' | 'dashboard' | 'detail';
+type Page = 'login' | 'dashboard' | 'detail' | 'admin' | 'adminUsers';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('login');
@@ -58,6 +66,14 @@ export default function App() {
     setSelectedLeadId(null);
   };
 
+  const handleNavigateToAdmin = () => {
+    setCurrentPage('admin');
+  };
+  
+  const handleOpenAdminUsers = () => {
+    setCurrentPage('adminUsers');
+  };
+
   return (
     <>
       {currentPage === 'login' && (
@@ -69,6 +85,8 @@ export default function App() {
           user={user}
           onLogout={handleLogout}
           onViewDetail={handleViewDetail}
+          onNavigateToAdmin={handleNavigateToAdmin}
+          onOpenAdminUsers={handleOpenAdminUsers}
         />
       )}
       
@@ -77,6 +95,21 @@ export default function App() {
           leadId={selectedLeadId}
           user={user}
           onBack={handleBackToDashboard}
+        />
+      )}
+
+      {currentPage === 'admin' && user && (
+        <AdminManagementPage 
+          user={user}
+          onBack={handleBackToDashboard}
+        />
+      )}
+      
+      {currentPage === 'adminUsers' && user && (
+        <AdminUserPage
+          user={user}
+          onLogout={handleLogout}
+          onBackToDashboard={handleBackToDashboard}
         />
       )}
     </>
