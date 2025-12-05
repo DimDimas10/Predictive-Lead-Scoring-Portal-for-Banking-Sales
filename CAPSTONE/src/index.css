@@ -229,7 +229,7 @@
   }
 
   img, svg, video, canvas, audio, iframe, embed, object {
-    /* vertical-align: middle; */
+    vertical-align: middle;
     display: block;
   }
 
@@ -1633,7 +1633,6 @@
 
   :is(.\*\:data-\[slot\=select-value\]\:line-clamp-1 > *)[data-slot="select-value"] {
     -webkit-line-clamp: 1;
-     line-clamp: 1;
     -webkit-box-orient: vertical;
     display: -webkit-box;
     overflow: hidden;
@@ -2275,4 +2274,10 @@ html {
     opacity: var(--tw-exit-opacity, 1);
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
+}
+
+/* penambahan*/
+
+[data-radix-portal], .radix-portal, [data-portal], .select-portal {
+  z-index: 2000 !important;
 }
