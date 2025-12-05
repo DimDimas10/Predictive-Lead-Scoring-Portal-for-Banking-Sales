@@ -23,11 +23,13 @@ interface DashboardPageProps {
   user: User;
   onLogout: () => void;
   onViewDetail: (leadId: string) => void;
+  onOpenAdminUsers: () => void;
 }
 
 const API_URL = 'http://localhost:5000/api';
+const PAGE_SIZE = 20;
 
-export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPageProps) {
+export function DashboardPage({ user, onLogout, onViewDetail, onOpenAdminUsers  }: DashboardPageProps) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,31 +37,62 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
   const [sortBy, setSortBy] = useState<'score' | 'name' | 'balance'>('score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(''); // State untuk error fetching
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1); // 👈 pagination
 
+  // 🔹 Initial load: cuma GET data dari DB (tanpa jalanin Python)
   useEffect(() => {
-    fetchLeadsWithMLScores();
+    fetchLeads();
   }, []);
 
-  const fetchLeadsWithMLScores = async () => {
-    setIsLoading(true);
-    setError(''); // Reset error
 
+  const fetchLeads = async () => {
+    setIsLoading(true);
+    setError('');
     try {
-      const response = await fetch(`${API_URL}/leads`);
+      const response = await fetch(
+      `${API_URL}/leads?userId=${encodeURIComponent(user.id)}&role=${encodeURIComponent(user.role)}`
+    );
       if (!response.ok) {
         throw new Error('Gagal mengambil data leads');
       }
       const data: Lead[] = await response.json();
       setLeads(data);
       setFilteredLeads(data);
+      setCurrentPage(1);
     } catch (err: any) {
+      console.error(err);
       setError(err.message || 'Terjadi kesalahan saat memuat data.');
     } finally {
       setIsLoading(false);
     }
   };
-  
+
+  // 🔹 Tombol "Refresh Skor ML" – ini yang memanggil Python + update skor
+const refreshLeadsWithMLScores = async () => {
+  setIsLoading(true);
+  setError('');
+
+  try {
+    const response = await fetch(`${API_URL}/leads/refresh-ml`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error('Gagal refresh skor ML');
+    }
+
+    await fetchLeads();
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || 'Terjadi kesalahan saat refresh skor ML.');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+  // 🔹 Filtering, search, sort
   useEffect(() => {
     let result = [...leads];
 
@@ -72,12 +105,10 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
       );
     }
 
-    // Filter by status
     if (statusFilter !== 'all') {
       result = result.filter((lead) => lead.status === statusFilter);
     }
 
-    
     result.sort((a, b) => {
       let compareValue = 0;
 
@@ -97,32 +128,51 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     });
 
     setFilteredLeads(result);
+    setCurrentPage(1); 
   }, [leads, searchTerm, statusFilter, sortBy, sortOrder]);
 
-  const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
-  
-    const oldLeads = [...leads];
-    const newLeads = leads.map((lead) => 
-      (lead.id === leadId ? { ...lead, status: newStatus, contactedAt: new Date() } : lead)
-    );
-    setLeads(newLeads);
+ 
+  const totalLeads = filteredLeads.length;
+  const totalPages = Math.max(1, Math.ceil(totalLeads / PAGE_SIZE));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const paginatedLeads = filteredLeads.slice(startIndex, startIndex + PAGE_SIZE);
 
-    try {
-      await fetch(`${API_URL}/leads/${leadId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-    
-    } catch (err) {
-      console.error('Gagal update status:', err);
-      // Rollback jika gagal
-      setLeads(oldLeads);
-      alert('Gagal memperbarui status. Silakan coba lagi.');
+const handleStatusChange = async (leadId: string, newStatus: Lead['status']) => {
+if (user.role === 'admin') return;
+const prevLeads = [...leads];
+setLeads(leads.map((lead) =>
+lead.id === leadId ? { ...lead, status: newStatus, contactedAt: new Date() } : lead
+));
+
+  try {
+    const res = await fetch(`${API_URL}/leads/${leadId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        status: newStatus,
+        userId: String(user.id),  
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.message || `Gagal update status lead (${res.status})`);
     }
-  };
+
+    // kalau mau sync dari server:
+    // const updated = await res.json();
+    // setLeads(ls => ls.map(l => l.id === updated.id ? { ...l, ...updated } : l));
+
+  } catch (err: any) {
+    console.error('Gagal update status:', err);
+    setLeads(prevLeads); // rollback UI
+    alert(err.message || 'Gagal memperbarui status. Silakan coba lagi.');
+  }
+};
+
+
 
   const toggleSort = (field: 'score' | 'name' | 'balance') => {
     if (sortBy === field) {
@@ -158,9 +208,10 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     }).format(amount);
   };
 
+  const highPriorityLeads = leads.filter(
+    (l) => Math.round(l.predictedScore * 100) >= 70 && l.status === 'pending'
+  ).length;
 
-  const totalLeads = leads.length;
-  const highPriorityLeads = leads.filter((l) => l.predictedScore >= 0.7 && l.status === 'pending').length;
   const contacted = leads.filter(
     (l) => l.status === 'contacted' || l.status === 'converted' || l.status === 'rejected'
   ).length;
@@ -174,6 +225,14 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
     ) : (
       <ArrowDown className="w-4 h-4 text-blue-600" />
     );
+  };
+
+  const goToPrevPage = () => {
+    setCurrentPage((p) => Math.max(1, p - 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((p) => Math.min(totalPages, p + 1));
   };
 
   return (
@@ -196,11 +255,19 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                 <p className="text-gray-900">{user.name}</p>
                 <p className="text-gray-500">{user.role}</p>
               </div>
+
+              {user.role === 'admin' && (
+                <Button variant="outline" onClick={onOpenAdminUsers}>
+                  Admin User
+                </Button>
+              )}
+
               <Button variant="outline" onClick={onLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
             </div>
+
           </div>
         </div>
       </div>
@@ -250,7 +317,9 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
             </CardHeader>
             <CardContent>
               <div className="text-gray-900">{contacted}</div>
-              <p className="text-gray-500">{totalLeads > 0 ? ((contacted / totalLeads) * 100).toFixed(0) : 0}% dari total</p>
+              <p className="text-gray-500">
+                {totalLeads > 0 ? ((contacted / totalLeads) * 100).toFixed(0) : 0}% dari total
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -287,7 +356,12 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={fetchLeadsWithMLScores} className="flex-1" disabled={isLoading}>
+                <Button
+                  variant="outline"
+                  onClick={refreshLeadsWithMLScores}
+                  className="flex-1"
+                  disabled={isLoading}
+                >
                   <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                   {isLoading ? 'Memuat...' : 'Refresh Skor ML'}
                 </Button>
@@ -296,14 +370,19 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
           </CardContent>
         </Card>
 
-        {/* Table */}
+        {/* Table + Pagination */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-gray-900">Daftar Nasabah Potensial ({filteredLeads.length})</CardTitle>
+              <CardTitle className="text-gray-900">
+                Daftar Nasabah Potensial ({filteredLeads.length})
+              </CardTitle>
               <p className="text-gray-600">
-                {sortBy === 'score' ? 'Diurutkan berdasarkan skor ML' : 
-                 sortBy === 'name' ? 'Diurutkan berdasarkan nama' : 'Diurutkan berdasarkan saldo'}
+                {sortBy === 'score'
+                  ? 'Diurutkan berdasarkan skor ML'
+                  : sortBy === 'name'
+                  ? 'Diurutkan berdasarkan nama'
+                  : 'Diurutkan berdasarkan saldo'}
               </p>
             </div>
           </CardHeader>
@@ -318,95 +397,140 @@ export function DashboardPage({ user, onLogout, onViewDetail }: DashboardPagePro
                 <p>{error}</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-gray-700">#</th>
-                      <th className="px-4 py-3 text-left">
-                        <button
-                          onClick={() => toggleSort('name')}
-                          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                        >
-                          Nama Nasabah
-                          <SortIcon field="name" />
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-left text-gray-700">Kontak</th>
-                      <th className="px-4 py-3 text-left">
-                        <button
-                          onClick={() => toggleSort('balance')}
-                          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                        >
-                          Saldo
-                          <SortIcon field="balance" />
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        <button
-                          onClick={() => toggleSort('score')}
-                          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                        >
-                          Skor ML
-                          <SortIcon field="score" />
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-center text-gray-700">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredLeads.map((lead, index) => (
-                      <tr key={lead.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-4 text-gray-700">{index + 1}</td>
-                        <td className="px-4 py-4">
-                          <div>
-                            <div className="text-gray-900">{lead.name}</div>
-                            <div className="text-gray-500">
-                              {lead.age} tahun • {lead.job}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="text-gray-700">{lead.phone}</div>
-                          <div className="text-gray-500">{lead.email}</div>
-                        </td>
-                        <td className="px-4 py-4 text-gray-900">{formatCurrency(lead.balance)}</td>
-                        <td className="px-4 py-4 text-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1 rounded-full border ${getScoreColor(
-                              lead.predictedScore
-                            )}`}
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-gray-700">#</th>
+                        <th className="px-4 py-3 text-left">
+                          <button
+                            onClick={() => toggleSort('name')}
+                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                           >
-                            {(lead.predictedScore * 100).toFixed(0)}%
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-center">{getStatusBadge(lead.status)}</td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center justify-center gap-2">
-                            {lead.status === 'pending' && (
-                              <Button size="sm" onClick={() => handleStatusChange(lead.id, 'contacted')}>
-                                <Phone className="w-4 h-4 mr-1" />
-                                Hubungi
-                              </Button>
-                            )}
-                            <Button size="sm" variant="outline" onClick={() => onViewDetail(lead.id)}>
-                              <Eye className="w-4 h-4 mr-1" />
-                              Detail
-                            </Button>
-                          </div>
-                        </td>
+                            Nama Nasabah
+                            <SortIcon field="name" />
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-left text-gray-700">Kontak</th>
+                        <th className="px-4 py-3 text-left">
+                          <button
+                            onClick={() => toggleSort('balance')}
+                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                          >
+                            Saldo
+                            <SortIcon field="balance" />
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleSort('score')}
+                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                          >
+                            Skor ML
+                            <SortIcon field="score" />
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center text-gray-700">Status</th>
+                        <th className="px-4 py-3 text-center text-gray-700">Aksi</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {paginatedLeads.map((lead, index) => (
+                        <tr key={lead.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 text-gray-700">
+                            {startIndex + index + 1}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="text-gray-900">{lead.name}</div>
+                              <div className="text-gray-500">
+                                {lead.age} tahun • {lead.job}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="text-gray-700">{lead.phone}</div>
+                            <div className="text-gray-500">{lead.email}</div>
+                          </td>
+                          <td className="px-4 py-4 text-gray-900">
+                            {formatCurrency(lead.balance)}
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <div
+                              className={`inline-flex items-center px-3 py-1 rounded-full border ${getScoreColor(
+                                lead.predictedScore
+                              )}`}
+                            >
+                              {(lead.predictedScore * 100).toFixed(0)}%
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            {getStatusBadge(lead.status)}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                             
+                              {lead.status === 'pending' && user.role !== 'admin' && (
+                              <Button size="sm" onClick={() => handleStatusChange(lead.id, 'contacted')}>
+                              <Phone className="w-4 h-4 mr-1" />
+                              Hubungi
+                              </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => onViewDetail(lead.id)}
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Detail
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-                {filteredLeads.length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500">Tidak ada data yang sesuai dengan filter</p>
+                  {filteredLeads.length === 0 && (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500">
+                        Tidak ada data yang sesuai dengan filter
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pagination controls */}
+                {filteredLeads.length > 0 && (
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="text-gray-600 text-sm">
+                      Menampilkan {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, totalLeads)} dari {totalLeads} nasabah
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={goToPrevPage}
+                        disabled={currentPage === 1}
+                      >
+                        Sebelumnya
+                      </Button>
+                      <span className="text-gray-700 text-sm">
+                        Halaman {currentPage} dari {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      >
+                        Selanjutnya
+                      </Button>
+                    </div>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </CardContent>
         </Card>

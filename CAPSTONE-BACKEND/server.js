@@ -13,7 +13,7 @@ const init = async () => {
     },
   });
 
-  // Daftarkan modul API sebagai plugin
+  
   await server.register([
     require('./src/api/users'),
     require('./src/api/leads')

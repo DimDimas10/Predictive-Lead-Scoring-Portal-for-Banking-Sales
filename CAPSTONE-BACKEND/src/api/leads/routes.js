@@ -4,6 +4,7 @@ const {
   getLeadByIdHandler,
   updateLeadStatusHandler,
   updateLeadNotesHandler,
+  refreshLeadsWithMLHandler,
 } = require('./handler');
 
 const routes = [
@@ -18,17 +19,24 @@ const routes = [
     handler: getLeadByIdHandler,
   },
   {
-    method: 'PUT',
-    path: '/leads/{id}/status',
-    handler: updateLeadStatusHandler,
-    options: {
-      validate: {
-        payload: Joi.object({
-          status: Joi.string().valid('pending', 'contacted', 'converted', 'rejected').required(),
-        }),
-      },
+    method: 'POST',
+    path: '/leads/refresh-ml',
+    handler: refreshLeadsWithMLHandler, 
+  },
+{
+  method: 'PUT',
+  path: '/leads/{id}/status',
+  handler: updateLeadStatusHandler,
+  options: {
+    validate: {
+      payload: Joi.object({
+        status: Joi.string().valid('pending', 'contacted', 'converted', 'rejected').required(),
+        userId: Joi.string().required(),   
+      }),
     },
   },
+},
+
   {
     method: 'PUT',
     path: '/leads/{id}/notes',
