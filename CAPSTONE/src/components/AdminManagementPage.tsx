@@ -46,7 +46,7 @@ interface AdminManagementPageProps {
   onBack: () => void;
 }
 
-const API_URL = 'https://predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app/api';
+const API_URL = 'http://localhost:5000/api';
 
 export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) {
   const { t, theme } = useThemeLanguage(); 
@@ -573,5 +573,6 @@ export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) 
   );
 
 }
+
 
 
