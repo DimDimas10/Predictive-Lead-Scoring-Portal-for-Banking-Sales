@@ -14,7 +14,7 @@ interface LoginPageProps {
   onBack: () => void; // <--- Tambahkan ini
 }
 
-const API_URL = 'https://postgres-production-ec27.up.railway.app/api';
+const API_URL = 'https://predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app/api';
 
 // 2. Destructure onBack dari props
 export function LoginPage({ onLogin, onBack }: LoginPageProps) {
