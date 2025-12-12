@@ -1,5 +1,5 @@
 'use strict';
-
+require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 
 const init = async () => {
@@ -80,3 +80,4 @@ process.on('uncaughtException', (err) => {
 });
 
 init();
+
