@@ -18,7 +18,7 @@ interface DetailPageProps {
   onBack: () => void;
 }
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app';
 
 export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
   const { t, language, theme } = useThemeLanguage();
