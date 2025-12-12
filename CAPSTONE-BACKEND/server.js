@@ -4,8 +4,12 @@ const Hapi = require('@hapi/hapi');
 
 const init = async () => {
   const server = Hapi.server({
-    port: process.env.PORT || 5000,
-    host: '0.0.0.0',
+    // 1. Ganti 5000 jadi process.env.PORT (PENTING! Biar Railway yang atur port-nya)
+    port: process.env.PORT || 5000, 
+    
+    // 2. Ganti 'localhost' jadi '0.0.0.0' (WAJIB! Biar bisa diakses dari luar container)
+    host: '0.0.0.0', 
+    
     routes: {
       cors: {
         origin: ['*'], 
@@ -35,3 +39,4 @@ process.on('unhandledRejection', (err) => {
 
 
 init();
+
