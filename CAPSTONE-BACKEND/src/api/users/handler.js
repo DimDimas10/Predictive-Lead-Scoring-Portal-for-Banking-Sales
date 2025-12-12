@@ -2,48 +2,27 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const pool = require('../../db');
 
-// LOGIN - dengan error handling lebih baik
+// LOGIN
 const loginHandler = async (request, h) => {
+  const { email, password } = request.payload;
+
   try {
-    const { email, password } = request.payload;
-
-    // Validasi input
-    if (!email || !password) {
-      return h.response({ 
-        message: 'Email dan password harus diisi' 
-      }).code(400);
-    }
-
     const result = await pool.query(
       'SELECT user_id, name, email, password_hash, role FROM users WHERE email = $1',
       [email]
     );
 
     if (result.rowCount === 0) {
-      return h.response({ 
-        message: 'Email atau password salah.' 
-      }).code(401);
+      return h.response({ message: 'Email atau password salah.' }).code(401);
     }
 
     const user = result.rows[0];
-    
-    // Pastikan password_hash ada
-    if (!user.password_hash) {
-      console.error('Password hash tidak ditemukan untuk user:', email);
-      return h.response({ 
-        message: 'Terjadi kesalahan. Silakan hubungi admin.' 
-      }).code(500);
-    }
-
     const isValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isValid) {
-      return h.response({ 
-        message: 'Email atau password salah.' 
-      }).code(401);
+      return h.response({ message: 'Email atau password salah.' }).code(401);
     }
 
-    // Sukses login
     return h.response({
       id: user.user_id,
       name: user.name,
@@ -53,11 +32,7 @@ const loginHandler = async (request, h) => {
 
   } catch (err) {
     console.error('Login error:', err);
-    // Pastikan tetap return JSON bahkan saat error
-    return h.response({ 
-      message: 'Terjadi kesalahan server',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Terjadi kesalahan server' }).code(500);
   }
 };
 
@@ -70,22 +45,19 @@ const getUsersHandler = async (request, h) => {
     return h.response(result.rows).code(200);
   } catch (err) {
     console.error('getUsersHandler error:', err);
-    return h.response({ 
-      message: 'Gagal mengambil data user',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Gagal mengambil data user' }).code(500);
   }
 };
 
 //  CREATE USER 
 const createUserHandler = async (request, h) => {
+  const { name, email, role, password } = request.payload;
+
+  if (!name || !email || !password) {
+    return h.response({ message: 'Semua field wajib diisi' }).code(400);
+  }
+
   try {
-    const { name, email, role, password } = request.payload;
-
-    if (!name || !email || !password) {
-      return h.response({ message: 'Semua field wajib diisi' }).code(400);
-    }
-
     const existing = await pool.query(
       'SELECT user_id FROM users WHERE email = $1',
       [email]
@@ -108,17 +80,13 @@ const createUserHandler = async (request, h) => {
 
   } catch (err) {
     console.error('createUserHandler error:', err);
-    return h.response({ 
-      message: 'Gagal menambahkan user',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Gagal menambahkan user' }).code(500);
   }
 };
-
 // GET /api/users/:id
 const getUserByIdHandler = async (request, h) => {
+  const { id } = request.params;
   try {
-    const { id } = request.params;
     const result = await pool.query(
       'SELECT user_id, name, email, role FROM users WHERE user_id = $1',
       [id]
@@ -131,23 +99,20 @@ const getUserByIdHandler = async (request, h) => {
     return h.response(result.rows[0]).code(200);
   } catch (err) {
     console.error('getUserByIdHandler error:', err);
-    return h.response({ 
-      message: 'Gagal mengambil data user',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Gagal mengambil data user' }).code(500);
   }
 };
 
 // PUT /api/users/:id
 const updateUserHandler = async (request, h) => {
+  const { id } = request.params;
+  const { name, email, role, password } = request.payload;
+
+  if (!name || !email || !role) {
+    return h.response({ message: 'Nama, email, dan role wajib diisi' }).code(400);
+  }
+
   try {
-    const { id } = request.params;
-    const { name, email, role, password } = request.payload;
-
-    if (!name || !email || !role) {
-      return h.response({ message: 'Nama, email, dan role wajib diisi' }).code(400);
-    }
-
     // cek user ada
     const existingUser = await pool.query(
       'SELECT user_id FROM users WHERE user_id = $1',
@@ -178,7 +143,9 @@ const updateUserHandler = async (request, h) => {
          WHERE user_id = $5`,
         [name, email, role, passwordHash, id]
       );
-    } else {
+    } 
+    // jika tidak, update tanpa password
+    else {
       await pool.query(
         `UPDATE users
          SET name = $1, email = $2, role = $3
@@ -197,34 +164,26 @@ const updateUserHandler = async (request, h) => {
 
   } catch (err) {
     console.error('updateUserHandler error:', err);
-    return h.response({ 
-      message: 'Gagal memperbarui user',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Gagal memperbarui user' }).code(500);
   }
 };
 
 // DELETE /api/users/:id
 const deleteUserHandler = async (request, h) => {
-  try {
-    const { id } = request.params;
+  const { id } = request.params;
 
-    const res = await pool.query(
-      'DELETE FROM users WHERE user_id = $1 RETURNING user_id', 
-      [id]
-    );
+  try {
+    const res = await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING user_id', [id]);
 
     if (res.rowCount === 0) {
       return h.response({ message: 'User tidak ditemukan' }).code(404);
     }
 
+    // sukses: kembalikan 200 dengan pesan atau 204 tanpa body
     return h.response({ message: 'User berhasil dihapus' }).code(200);
   } catch (err) {
     console.error('deleteUserHandler error:', err);
-    return h.response({ 
-      message: 'Gagal menghapus user',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    }).code(500);
+    return h.response({ message: 'Gagal menghapus user' }).code(500);
   }
 };
 
