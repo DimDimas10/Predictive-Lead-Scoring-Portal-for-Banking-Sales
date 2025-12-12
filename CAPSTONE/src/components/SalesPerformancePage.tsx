@@ -7,7 +7,7 @@ import { RefreshCw, ArrowLeft, Eye, Search, Filter } from 'lucide-react';
 import type { User, Lead } from '../App';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext'; // [1] Import Hook
 
-const API_URL = 'predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app';
+const API_URL = 'https://predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app/api';
 const PAGE_SIZE = 20;
 
 interface SalesPerformancePageProps {
@@ -325,3 +325,4 @@ export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerfor
   );
 
 }
+
