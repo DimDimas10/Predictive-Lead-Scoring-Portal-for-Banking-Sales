@@ -20,9 +20,13 @@ const routes = [
           email: Joi.string().email().required(),
           password: Joi.string().required(),
         }),
-        failAction: (request, h, err) => {
-          // kembalikan error validation yang lebih ramah
-          throw err;
+        failAction: async (request, h, err) => {
+          // Return JSON response bahkan saat validation error
+          console.error('Validation Error:', err.message);
+          return h.response({
+            message: 'Validasi gagal',
+            details: err.details.map(d => d.message)
+          }).code(400).takeover();
         }
       },
     },
@@ -44,7 +48,12 @@ const routes = [
       validate: {
         params: Joi.object({
           id: Joi.string().required(),
-        })
+        }),
+        failAction: async (request, h, err) => {
+          return h.response({
+            message: 'ID tidak valid'
+          }).code(400).takeover();
+        }
       }
     }
   },
@@ -62,7 +71,12 @@ const routes = [
           role: Joi.string().valid('admin', 'sales').required(),
           password: Joi.string().min(6).required(),
         }),
-        failAction: (request, h, err) => { throw err; }
+        failAction: async (request, h, err) => {
+          return h.response({
+            message: 'Validasi gagal',
+            details: err.details.map(d => d.message)
+          }).code(400).takeover();
+        }
       },
     },
   },
@@ -79,10 +93,14 @@ const routes = [
           name: Joi.string().min(3).required(),
           email: Joi.string().email().required(),
           role: Joi.string().valid('admin', 'sales').required(),
-          // password optional for update
           password: Joi.string().min(6).optional().allow('', null),
         }),
-        failAction: (request, h, err) => { throw err; }
+        failAction: async (request, h, err) => {
+          return h.response({
+            message: 'Validasi gagal',
+            details: err.details.map(d => d.message)
+          }).code(400).takeover();
+        }
       },
     },
   },
@@ -94,7 +112,12 @@ const routes = [
     handler: deleteUserHandler,
     options: {
       validate: {
-        params: Joi.object({ id: Joi.string().required() })
+        params: Joi.object({ id: Joi.string().required() }),
+        failAction: async (request, h, err) => {
+          return h.response({
+            message: 'ID tidak valid'
+          }).code(400).takeover();
+        }
       }
     }
   },
