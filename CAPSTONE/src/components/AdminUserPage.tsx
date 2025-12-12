@@ -10,7 +10,8 @@ import { ModalPortal } from './ModalPortal';
 import Swal from 'sweetalert2';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
-const API_URL = 'https://postgres-production-ec27.up.railway.app/api';
+
+const API_URL = 'https://predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app/api';
 
 interface AdminUserPageProps {
   user: User;
@@ -325,5 +326,6 @@ export function AdminUserPage({ user, onLogout, onBackToDashboard }: AdminUserPa
   );
 
 }
+
 
 
