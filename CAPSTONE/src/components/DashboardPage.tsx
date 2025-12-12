@@ -20,7 +20,7 @@ interface DashboardPageProps {
   onNavigateToSales?: () => void;
 }
 
-const API_URL = 'predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app';
+const API_URL = 'https://predictive-lead-scoring-portal-for-banking-sales-production.up.railway.app/api';
 const PAGE_SIZE = 20;
 
 export function DashboardPage({ 
