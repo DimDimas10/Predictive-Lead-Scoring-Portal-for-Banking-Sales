@@ -20,7 +20,7 @@ interface DashboardPageProps {
   onNavigateToSales?: () => void;
 }
 
-import { API_URL } from '../config/config';
+const API_URL = 'http://localhost:5000/api'
 const PAGE_SIZE = 20;
 
 export function DashboardPage({ 
