@@ -10,8 +10,7 @@ import { ModalPortal } from './ModalPortal';
 import Swal from 'sweetalert2';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
-
-import { API_URL } from '../config/config';
+const API_URL = 'http://localhost:5000/api';
 
 interface AdminUserPageProps {
   user: User;
@@ -324,10 +323,4 @@ export function AdminUserPage({ user, onLogout, onBackToDashboard }: AdminUserPa
       )}
     </div>
   );
-
 }
-
-
-
-
-
