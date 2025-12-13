@@ -18,7 +18,7 @@ interface DetailPageProps {
   onBack: () => void;
 }
 
-import { API_URL } from '../config/config';
+const API_URL = 'http://localhost:5000/api'
 
 export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
   const { t, language, theme } = useThemeLanguage();
