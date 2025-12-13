@@ -46,7 +46,7 @@ interface AdminManagementPageProps {
   onBack: () => void;
 }
 
-import { API_URL } from '../config/config';
+const API_URL = 'http://localhost:5000/api';
 
 export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) {
   const { t, theme } = useThemeLanguage(); 
@@ -573,6 +573,7 @@ export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) 
   );
 
 }
+
 
 
 
