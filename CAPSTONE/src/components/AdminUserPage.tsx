@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
 
-const API_URL = 'http://localhost:5000/api';
+import { API_URL } from '../config/config';
 
 interface AdminUserPageProps {
   user: User;
@@ -326,6 +326,7 @@ export function AdminUserPage({ user, onLogout, onBackToDashboard }: AdminUserPa
   );
 
 }
+
 
 
 
