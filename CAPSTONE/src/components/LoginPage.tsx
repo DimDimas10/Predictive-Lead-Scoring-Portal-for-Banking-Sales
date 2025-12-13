@@ -14,7 +14,7 @@ interface LoginPageProps {
   onBack: () => void; // <--- Tambahkan ini
 }
 
-import { API_URL } from '../config/config';
+const API_URL = 'http://localhost:5000/api'
 
 // 2. Destructure onBack dari props
 export function LoginPage({ onLogin, onBack }: LoginPageProps) {
