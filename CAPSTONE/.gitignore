@@ -1,0 +1,6 @@
+# Environment files
+.env
+.env*.local
+
+# Tapi COMMIT .env.development dan .env.production
+# (karena tidak berisi secret key, hanya URL)
