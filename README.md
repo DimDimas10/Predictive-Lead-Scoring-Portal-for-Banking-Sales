@@ -1,27 +1,165 @@
-# Predictive-Lead-Scoring-Portal-for-Banking-Sales
+# Predictive Lead Scoring Portal for Banking Sales
 
-## Arsiterktur FE dan BE
-- untuk FE sendiri project kita bangun menggunakan React dan TS untuk menampilkan 3 halaman yaitu: Login, Dashboard, dan Detail dari si nasabah
-- untuk BE kita pakai Hapi.js(node.js) buat nyediain API untuk login dan data(yang sementara kita taruh difolder BE page leads.js)
+Predictive Lead Scoring Portal for Banking Sales adalah aplikasi yang membantu tim sales perbankan dalam menentukan prioritas nasabah berdasarkan skor probabilitas hasil Machine Learning.  
+Aplikasi ini dikembangkan sebagai bagian dari **Capstone Project (Dicoding x Accenture)** dan terdiri dari tiga komponen utama: **Frontend**, **Backend**, dan **Model Machine Learning**.
 
-## Process state
-- Untuk sementara BE kita sengaja kita pakai data tiruan dahulu(mock data)
-- untuk data si usernya kita ambil langsung di folder BE/src/data/users.js dan untuk si nasabahnya di ../leads.js
-- untuk proses ini kami(REBE) buat sementara karena gua(adjie) butuh buat skema ui untuk detail page-nya
-- Model ML sudah selesai dilatih menggunakan beberapa algoritma:
-1. Logistic Regression
-2. Random Forest
-3. Gradient Boosting
-4. SVM (RBF)
-Setelah evaluasi, model GradientBoostingClassifier menjadi kandidat terbaik (AUC tertinggi).
-- preprocessing dan model sudah digabung menggunakan pipeline.
-- model disimpan dalam format .pkl yang akan dijalankan menggunakan file python
-- membuat file python untuk menjalankan model yang sudah disimpan, kemudian output modelnya disimpan dalam format .json untuk panggil backend (nodejs)
-  
-## Next step
-- kita bakal mindahin data(bila sudah ready) dari file users.js dan leads.js ke DB-nya
-- kita(REBE) refactor lagi BE nya,utamanya kita perbarui lagi tuh handler.js nya ke DB-nya(kalau implementasi DBnya sudah ready)
-- nah kan sebelumnya gua(adjie) dah buat logic filter sama sortnya di FE(bersifat sementara dan mintol gemini soalnya gua gk tau caranya hehee)di file dashboard page tuh nah kalau sudah ada dari tim ML untuk logic filternya bisa kita pakai dan kita masukin di BE-nya(ini supaya FE-nya gk lemot aja)
-- untuk API sekali lagi kita masih nunggu DB-nya sekalian karna setelah kita hubungin API dari BE dengan API dari ML buat ngambil skornya kan secara langsung dia nge-save ke databasenya
 
-mohon koreksiannya bang abang sekalian tengkyu :)
+
+## Gambaran Umum Sistem
+
+Sistem Predictive Lead Scoring Portal for Banking Sales terdiri dari:
+
+1. **Model Machine Learning**  
+   Digunakan untuk memproses data nasabah, melakukan preprocessing, menghitung skor probabilitas, dan menyimpan hasil prediksi ke database.
+
+2. **Backend API**  
+   Menghubungkan aplikasi dengan database serta menangani proses penyimpanan dan pengelolaan data.
+
+3. **Frontend**  
+   Portal lead scoring yang digunakan oleh tim sales bank untuk melihat daftar nasabah dan skor prediksi hasil Machine Learning.
+
+
+
+## Teknologi yang Digunakan
+
+### Frontend
+- Framework: React + TypeScript  
+- UI: TailwindCSS / Component Library  
+- Fungsi:
+  - Menampilkan dashboard
+  - Menampilkan data nasabah
+  - Menampilkan skor prediksi Machine Learning
+
+### Backend API
+- Framework: Node.js (Hapi.js / Express)
+- Database: PostgreSQL
+- Fungsi:
+  - CRUD data nasabah
+  - Menyimpan skor prediksi
+  - Integrasi dengan model Machine Learning
+
+### Machine Learning Model
+- Bahasa: Python 3.10+
+- Model akhir: Gradient Boosting / LightGBM (SMOTE Tuned)
+- Pipeline: preprocessing + model + encoding
+- Library utama:
+  - scikit-learn
+  - pandas
+  - numpy
+  - joblib
+  - imbalanced-learn
+  - lightgbm
+
+
+
+## Cara Instalasi dan Penyiapan Proyek
+
+### 1. Instalasi Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Aplikasi frontend akan berjalan di:
+
+```
+http://localhost:3000
+```
+
+
+### 2. Instalasi Backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Backend akan berjalan di:
+
+```
+http://localhost:5000
+```
+
+**Catatan:**
+- Backend saat ini masih menggunakan **mock data**
+- Data user berada di `BE/src/data/users.js`
+- Data nasabah berada di `BE/src/pages/leads.js`
+
+
+
+### 3. Setup Database PostgreSQL
+
+```bash
+psql -U postgres -d nama_database -f nama_file.sql
+```
+
+Konfigurasi database backend:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=nama_database
+```
+
+
+
+### 4. Instalasi Model Machine Learning
+
+```bash
+cd ml
+pip install -r requirements.txt
+```
+
+
+
+### 5. Menjalankan Prediksi Machine Learning
+
+```bash
+python hitung_skor_nasabah.py
+```
+
+Script ini akan:
+1. Mengambil data nasabah dari database
+2. Melakukan preprocessing dan feature engineering
+3. Memuat model Machine Learning dari file `.pkl`
+4. Menghitung probabilitas prediksi
+5. Menyimpan hasil prediksi ke database
+
+Hasil skor prediksi akan otomatis muncul di dashboard frontend.
+
+
+
+## Petunjuk Penggunaan Aplikasi
+
+### Login
+Pengguna melakukan login menggunakan akun demo yang tersedia dan diarahkan ke dashboard sesuai role.
+
+
+
+### Role Admin
+- Melihat daftar nasabah dan skor prediksi
+- Melihat ranking nasabah
+- Mengelola akun Sales
+- Mengelola data nasabah
+- Melakukan refresh skor Machine Learning
+
+
+### Role Sales
+- Melihat daftar nasabah dan skor prediksi
+- Menentukan prioritas follow up
+- Mengubah status nasabah (Sudah Dihubungi / Terkonversi / Ditolak)
+- Melihat riwayat kinerja pada halaman **Peforma Saya**
+
+
+
+## Status Pengembangan
+
+- Backend masih menggunakan mock data
+- Model Machine Learning sudah selesai dilatih
+- Integrasi database masih dalam tahap pengembangan
+
