@@ -1,6 +1,4 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  // PENTING: Ini mengaktifkan dark mode berbasis class (toggle manual)
   darkMode: ["class"], 
   
   content: [
@@ -10,7 +8,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Menghubungkan class Tailwind ke variabel CSS di globals.css
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
@@ -63,4 +60,5 @@ export default {
     },
   },
   plugins: [],
+
 }
