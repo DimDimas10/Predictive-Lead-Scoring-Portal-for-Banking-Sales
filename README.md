@@ -68,7 +68,6 @@ Aplikasi frontend akan berjalan di:
 http://localhost:3000
 ```
 
-
 ### 2. Instalasi Backend
 
 ```bash
@@ -83,13 +82,6 @@ Backend akan berjalan di:
 http://localhost:5000
 ```
 
-**Catatan:**
-- Backend saat ini masih menggunakan **mock data**
-- Data user berada di `BE/src/data/users.js`
-- Data nasabah berada di `BE/src/pages/leads.js`
-
-
-
 ### 3. Setup Database PostgreSQL
 
 ```bash
@@ -98,15 +90,13 @@ psql -U postgres -d nama_database -f nama_file.sql
 
 Konfigurasi database backend:
 
-```env
+```db.js
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your_password
 DB_NAME=nama_database
 ```
-
-
 
 ### 4. Instalasi Model Machine Learning
 
@@ -115,31 +105,28 @@ cd ml
 pip install -r requirements.txt
 ```
 
-
-
 ### 5. Menjalankan Prediksi Machine Learning
 
 ```bash
-python hitung_skor_nasabah.py
+python app.py
 ```
 
 Script ini akan:
 1. Mengambil data nasabah dari database
 2. Melakukan preprocessing dan feature engineering
-3. Memuat model Machine Learning dari file `.pkl`
+3. Memuat model Machine Learning dari file `.joblib`
 4. Menghitung probabilitas prediksi
 5. Menyimpan hasil prediksi ke database
 
 Hasil skor prediksi akan otomatis muncul di dashboard frontend.
 
-
-
 ## Petunjuk Penggunaan Aplikasi
 
 ### Login
-Pengguna melakukan login menggunakan akun demo yang tersedia dan diarahkan ke dashboard sesuai role.
-
-
+Saat aplikasi dijalankan, pengguna akan diarahkan ke Landing Page. Untuk mulai menggunakan
+aplikasi, klik tombol Login. Pada tahap ini, pengguna dapat melakukan simulasi login menggunakan
+akun demo Admin yang telah disediakan. Setelah login berhasil, pengguna akan masuk ke dashboard
+sesuai dengan role akun tersebut. silahkan buat sales baru untuk login sebagai sales
 
 ### Role Admin
 - Melihat daftar nasabah dan skor prediksi
@@ -147,6 +134,7 @@ Pengguna melakukan login menggunakan akun demo yang tersedia dan diarahkan ke da
 - Mengelola akun Sales
 - Mengelola data nasabah
 - Melakukan refresh skor Machine Learning
+- monitoring aktifitas setiap sales
 
 
 ### Role Sales
@@ -154,12 +142,14 @@ Pengguna melakukan login menggunakan akun demo yang tersedia dan diarahkan ke da
 - Menentukan prioritas follow up
 - Mengubah status nasabah (Sudah Dihubungi / Terkonversi / Ditolak)
 - Melihat riwayat kinerja pada halaman **Peforma Saya**
+ ## Saat status nasabah diperbarui:
+   1. Jika nasabah dikategorikan sebagai Terkonversi, maka nasabah tersebut tidak akan lagi
+   muncul di daftar nasabah pada Sales lainnya. Hal ini dilakukan untuk memastikan bahwa
+   nasabah yang sudah berhasil dikonversi tidak dihubungi dua kali.
+   2. Jika nasabah diberi status Ditolak, maka nasabah tersebut juga tidak akan ditampilkan di
+   dashboard Sales lain guna menghindari telepon berulang (spam calling).
+   Nasabah dengan status Ditolak akan kembali menjadi Pending otomatis setelah 1 hari,
+   sehingga dapat muncul kembali di daftar Sales untuk dilakukan follow up ulang.
 
 
-
-## Status Pengembangan
-
-- Backend masih menggunakan mock data
-- Model Machine Learning sudah selesai dilatih
-- Integrasi database masih dalam tahap pengembangan
 
