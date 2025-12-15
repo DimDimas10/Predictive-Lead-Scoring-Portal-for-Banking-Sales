@@ -136,7 +136,6 @@ sesuai dengan role akun tersebut. silahkan buat sales baru untuk login sebagai s
 - Melakukan refresh skor Machine Learning
 - monitoring aktifitas setiap sales
 
-
 ### Role Sales
 - Melihat daftar nasabah dan skor prediksi
 - Menentukan prioritas follow up
@@ -151,5 +150,67 @@ sesuai dengan role akun tersebut. silahkan buat sales baru untuk login sebagai s
    Nasabah dengan status Ditolak akan kembali menjadi Pending otomatis setelah 1 hari,
    sehingga dapat muncul kembali di daftar Sales untuk dilakukan follow up ulang.
 
+## Role Admin
+### 2. Dashboard Admin
+Pada Dashboard Admin, sistem menampilkan:
+- Daftar nasabah
+- Skor probabilitas hasil prediksi Machine Learning
+- Ranking nasabah berdasarkan skor tertinggi
+
+Admin dapat melihat prioritas nasabah, namun tidak dapat mengubah status follow up.  
+Admin juga dapat menekan tombol **“Refresh Skor ML”** untuk menjalankan ulang proses prediksi dan memperbarui skor seluruh nasabah.
+
+---
+
+### 3. Mengelola Akun Sales (Halaman *Admin User*)
+Pada halaman ini, Admin dapat:
+- Membuat akun Sales baru
+- melihat daftar Sales yang sudah terdaftar
+- Mengelola atau menghapus akun Sales
+- Memantau nasabah yang telah dihubungi oleh masing-masing Sales
+
+Fitur ini membantu Admin memonitor kinerja Sales secara menyeluruh.
+
+---
+
+### 4. Mengelola Data Nasabah (Halaman *Kelola Data*)
+Admin dapat:
+- Melihat data nasabah
+- Menambahkan data nasabah baru
+- Mengedit data nasabah
+- Menghapus data nasabah
+Seluruh data disimpan di PostgreSQL dan akan diproses oleh model Machine Learning.
+---
+
+## Role Sales
+### 5. Dashboard Sales
+Pada Dashboard Sales, sistem menampilkan:
+- daftar nasabah
+- skor probabilitas yang telah dihitung menggunakan model ML
+- urutan ranking nasabah berdasarkan skor tertinggi
+- informasi yang digunakan untuk proses follow up
+- tombol “sudah dihubungi” untuk mengubah status nasabah
+
+Sales menggunakan ranking ini untuk menentukan prioritas panggilan.  
+Sales juga dapat menekan tombol **“Refresh Skor ML”** untuk mendapatkan skor terbaru.
+
+---
+
+### 6. Update Status Nasabah (Halaman Detail Nasabah)
+Pada halaman detail nasabah, Sales dapat mengubah status menjadi:
+- **Sudah Dihubungi**
+- **Terkonversi**
+- **Ditolak**
+
+Aturan sistem:
+- Status **Terkonversi** → nasabah tidak muncul lagi di Sales lain.
+- Status **Ditolak** → nasabah disembunyikan sementara untuk menghindari spam calling. otomatis kembali menjadi **Pending** setelah 1 hari.
+---
+
+### 7. Melihat Riwayat Kinerja (Halaman *Peforma Saya*)
+Sales dapat melihat riwayat nasabah yang telah dihubungi beserta statusnya.  
+Fitur ini membantu Sales memantau progres dan performa kerja mereka.
+
+---
 
 
