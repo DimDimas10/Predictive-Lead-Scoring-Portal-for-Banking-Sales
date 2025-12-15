@@ -14,7 +14,6 @@ const init = async () => {
     },
   });
 
-  // Pastikan folder src/api/users dan src/api/leads ada dan memiliki index.js
   await server.register([
     require('./src/api/users'),
     require('./src/api/leads')
@@ -34,4 +33,5 @@ process.on('unhandledRejection', (err) => {
 });
 
 init();
+
 
