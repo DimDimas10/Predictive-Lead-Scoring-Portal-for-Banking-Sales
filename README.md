@@ -1,6 +1,6 @@
 # Predictive Lead Scoring Portal for Banking Sales
 
-Predictive Lead Scoring Portal for Banking Sales adalah aplikasi yang membantu tim sales perbankan dalam menentukan prioritas nasabah berdasarkan skor probabilitas hasil Machine Learning.  
+Proyek ini mengembangkan Predictive Lead Scoring Portal for Banking Sales, sebuah aplikasi berbasis web yang memanfaatkan Machine Learning untuk memprioritaskan calon nasabah deposito berjangka. Sistem menghasilkan skor probabilitas berlangganan bagi setiap prospek sehingga tim sales dapat fokus pada calon nasabah dengan potensi konversi tertinggi. Solusi ini meningkatkan efisiensi kerja, menurunkan biaya operasional, serta mendukung pengambilan keputusan berbasis data. Inovasi utama meliputi pemisahan peran admin dan sales, fitur anti-spam calling, pembaruan skor prediksi secara real-time, serta monitoring aktivitas sales.
 Aplikasi ini dikembangkan sebagai bagian dari **Capstone Project (Dicoding x Accenture)** dan terdiri dari tiga komponen utama: **Frontend**, **Backend**, dan **Model Machine Learning**.
 
 
