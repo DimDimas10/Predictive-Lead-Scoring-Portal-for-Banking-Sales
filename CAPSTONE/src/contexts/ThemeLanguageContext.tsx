@@ -15,7 +15,7 @@ const ThemeLanguageContext = createContext<ThemeLanguageContextType | undefined>
 
 const translations: Record<string, Record<string, string>> = {
   id: {
-    // --- GLOBAL ---
+    // GLOBAL
     loading: "Memuat...",
     error: "Terjadi kesalahan",
     fetchError: "Gagal mengambil data dari server",
@@ -461,3 +461,4 @@ export const useThemeLanguage = () => {
   return context;
 
 };
+
