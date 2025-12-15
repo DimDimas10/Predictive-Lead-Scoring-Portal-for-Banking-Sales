@@ -3,20 +3,18 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Building2, Lock, Mail, AlertCircle, ArrowLeft } from 'lucide-react'; // Tambah ArrowLeft
+import { Building2, Lock, Mail, AlertCircle, ArrowLeft } from 'lucide-react';
 import type { User } from '../App';
 import Swal from 'sweetalert2';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
-// 1. Update Interface untuk menerima prop onBack
 interface LoginPageProps {
   onLogin: (user: User) => void;
-  onBack: () => void; // <--- Tambahkan ini
+  onBack: () => void;
 }
 
 const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 
-// 2. Destructure onBack dari props
 export function LoginPage({ onLogin, onBack }: LoginPageProps) {
   const { t, theme } = useThemeLanguage();
   const [email, setEmail] = useState('');
@@ -79,7 +77,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
       bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 
       dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       
-      {/* 3. TOMBOL KEMBALI (BACK BUTTON) */}
+      {/*BACK BUTTON*/}
       <button 
         onClick={onBack}
         className="absolute top-6 left-6 flex items-center text-white/80 hover:text-white transition-all hover:-translate-x-1 group"
@@ -88,12 +86,11 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
           <ArrowLeft className="w-5 h-5" />
         </div>
         <span className="font-medium text-sm md:text-base">
-           {/* Gunakan t('back') jika ada, atau hardcode */}
            Kembali
         </span>
       </button>
 
-      <div className="w-full max-w-md mt-10 md:mt-0"> {/* Tambah mt agar tidak nabrak tombol back di HP */}
+      <div className="w-full max-w-md mt-10 md:mt-0"> 
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
             <Building2 className="w-8 h-8 text-blue-600" />
