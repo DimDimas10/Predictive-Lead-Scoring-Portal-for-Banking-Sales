@@ -2,11 +2,11 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'dimasgundar10',
-  database: process.env.DB_NAME || 'predictive_bank',
+  host: 'hopper.proxy.rlwy.net',  
+  port: 56004,                 
+  user: 'postgres',               
+  password: 'GVadVDXDiPZYJUuwrXmbTbkIcyDCSEQw',
+  database: 'railway',            
 });
 
 module.exports = pool;

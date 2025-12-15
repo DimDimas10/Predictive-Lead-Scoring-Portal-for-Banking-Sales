@@ -4,8 +4,7 @@ scikit-learn==1.6.1
 imbalanced-learn
 joblib
 psycopg2
-lightgbm
 SQLAlchemy
-
-
-
+lightgbm
+fastapi
+uvicorn

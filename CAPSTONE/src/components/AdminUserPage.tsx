@@ -10,7 +10,7 @@ import { ModalPortal } from './ModalPortal';
 import Swal from 'sweetalert2';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
-import { API_URL } from '../config/api';
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 
 interface AdminUserPageProps {
   user: User;
@@ -325,3 +325,5 @@ export function AdminUserPage({ user, onLogout, onBackToDashboard }: AdminUserPa
   );
 
 }
+
+

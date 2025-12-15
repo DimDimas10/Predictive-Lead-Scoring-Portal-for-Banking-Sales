@@ -7,7 +7,7 @@ import { RefreshCw, ArrowLeft, Eye, Search, Filter } from 'lucide-react';
 import type { User, Lead } from '../App';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext'; // [1] Import Hook
 
-import { API_URL } from '../config/api';
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 const PAGE_SIZE = 20;
 
 interface SalesPerformancePageProps {
@@ -325,3 +325,5 @@ export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerfor
   );
 
 }
+
+

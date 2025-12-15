@@ -20,7 +20,7 @@ interface DashboardPageProps {
   onNavigateToSales?: () => void;
 }
 
-import { API_URL } from '../config/api';
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 const PAGE_SIZE = 20;
 
 export function DashboardPage({ 
@@ -77,7 +77,8 @@ export function DashboardPage({
     });
 
     try {
-      const response = await fetch(`${API_URL}/leads/refresh-ml`, { method: 'POST' });
+      const ML_API_URL = "https://eksperimendeploy-production.up.railway.app"
+      const response = await fetch(`${ML_API_URL}/leads/refresh-ml`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to refresh ML');
       await fetchLeads();
       

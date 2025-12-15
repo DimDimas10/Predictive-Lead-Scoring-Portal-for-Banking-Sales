@@ -1,4 +1,4 @@
-// leadsHandlers.js
+// leadsHandlers.js ah
 const pool = require('../../db');
 const { exec } = require('child_process');
 const path = require('path');
@@ -342,27 +342,37 @@ const updateLeadNotesHandler = async (request, h) => {
  */
 const refreshLeadsWithMLHandler = async (request, h) => {
   try {
-    const scriptPath = path.resolve(__dirname, '../../../../ML/hitung_skor_nasabah.py');
-    const pythonCommand = 'python';
+    const mlUrl = `${process.env.ML_API_URL}/leads/refresh-ml`;
 
-    const runPython = () =>
-      new Promise((resolve, reject) => {
-        exec(`${pythonCommand} "${scriptPath}"`, (error, stdout, stderr) => {
-          if (error) {
-            console.error('Python Error:', stderr || error.message);
-            return reject(error);
-          }
-          console.log('Python Output:', stdout || '(no output)');
-          resolve(null);
-        });
-      });
+    const response = await fetch(mlUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
-    await runPython();
-    return h.response({ message: 'Skor ML berhasil di-refresh' }).code(200);
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('ML Service Error:', text);
+      return h
+        .response({ message: 'ML service error', detail: text })
+        .code(500);
+    }
+
+    const data = await response.json();
+
+    return h
+      .response({
+        message: 'Skor ML berhasil di-refresh',
+        ml_result: data
+      })
+      .code(200);
 
   } catch (error) {
     console.error('refreshLeadsWithMLHandler Error:', error);
-    return h.response({ message: 'Gagal refresh skor ML' }).code(500);
+    return h
+      .response({ message: 'Gagal refresh skor ML' })
+      .code(500);
   }
 };
 
@@ -450,3 +460,8 @@ module.exports = {
   updateLeadNotesHandler,
   refreshLeadsWithMLHandler,
 };
+
+
+
+
+

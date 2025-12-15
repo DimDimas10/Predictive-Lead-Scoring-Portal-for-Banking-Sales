@@ -14,7 +14,7 @@ interface LoginPageProps {
   onBack: () => void; // <--- Tambahkan ini
 }
 
-import { API_URL } from '../config/api';
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 
 // 2. Destructure onBack dari props
 export function LoginPage({ onLogin, onBack }: LoginPageProps) {

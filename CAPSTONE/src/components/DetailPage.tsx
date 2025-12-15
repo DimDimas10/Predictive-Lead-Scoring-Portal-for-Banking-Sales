@@ -18,7 +18,7 @@ interface DetailPageProps {
   onBack: () => void;
 }
 
-import { API_URL } from '../config/api';
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 
 export function DetailPage({ leadId, user, onBack }: DetailPageProps) {
   const { t, language, theme } = useThemeLanguage();

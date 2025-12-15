@@ -46,8 +46,8 @@ interface AdminManagementPageProps {
   onBack: () => void;
 }
 
-import { API_URL } from '../config/api';
 
+const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) {
   const { t, theme } = useThemeLanguage(); 
   
@@ -573,3 +573,5 @@ export function AdminManagementPage({ user, onBack }: AdminManagementPageProps) 
   );
 
 }
+
+
