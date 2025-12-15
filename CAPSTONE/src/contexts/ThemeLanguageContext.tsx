@@ -13,10 +13,6 @@ interface ThemeLanguageContextType {
 
 const ThemeLanguageContext = createContext<ThemeLanguageContextType | undefined>(undefined);
 
-// ============================================
-// KAMUS TERJEMAHAN LENGKAP (FINAL FIXED)
-// ============================================
-
 const translations: Record<string, Record<string, string>> = {
   id: {
     // --- GLOBAL ---
@@ -42,7 +38,7 @@ const translations: Record<string, Record<string, string>> = {
     processing: "Memproses...",
     footerRights: "© 2024 Bank Sales Dashboard. All rights reserved.",
     
-    // --- LOGIN ---
+    // LOGIN 
     loginTitle: "Login ke Dashboard",
     loginDesc: "Masukkan kredensial Anda untuk mengakses sistem",
     loginBtn: "Masuk",
@@ -51,7 +47,7 @@ const translations: Record<string, Record<string, string>> = {
     welcomeBack: "Selamat Datang Kembali",
     demoCreds: "Akun Demo:",
     
-    // --- DASHBOARD & METRICS ---
+    // DASHBOARD & METRICS
     dashTitle: "Dashboard Penjualan",
     dashSubtitle: "Sistem Skor Prospek Prediktif",
     logout: "Keluar",
@@ -67,7 +63,7 @@ const translations: Record<string, Record<string, string>> = {
     contacted: "Dihubungi",
     contactedDesc: "dari total nasabah",
     
-    // --- FILTERS & TABLES ---
+    // FILTERS & TABLES
     searchPlaceholder: "Cari...",
     filterStatus: "Filter Status",
     allStatus: "Semua Status",
@@ -85,7 +81,7 @@ const translations: Record<string, Record<string, string>> = {
     next: "Lanjut",
     btnCall: "Hubungi",
     
-    // --- DETAIL PAGE SPECIFIC ---
+    // DETAIL PAGE SPECIFIC
     detailCustomer: "Detail Nasabah",
     detailSubtitle: "Informasi lengkap dan skor prediksi ML",
     customerProfile: "Profil Nasabah",
@@ -105,7 +101,7 @@ const translations: Record<string, Record<string, string>> = {
     convertedSuccess: "Nasabah Terkonversi",
     rejectedFail: "Nasabah Menolak",
     
-    // --- ADMIN PAGES ---
+    // ADMIN PAGES
     managementPageTitle: "Manajemen Data Nasabah",
     managementPageDesc: "Kelola data profil, finansial, dan riwayat kampanye.",
     customerList: "Daftar Nasabah",
@@ -129,7 +125,7 @@ const translations: Record<string, Record<string, string>> = {
     leadsHistory: "Riwayat Nasabah",
     noLeadsHistory: "Belum ada riwayat.",
 
-    // --- ALERTS ---
+    // ALERTS
     confirmChange: "Ubah Status?",
     confirmChangeDesc: "Yakin ubah status ke",
     yesChange: "Ya, Ubah",
@@ -152,7 +148,7 @@ const translations: Record<string, Record<string, string>> = {
     userUpdated: "User berhasil diupdate",
     userDeleted: "User berhasil dihapus",
 
-    // --- LABELS & COLUMNS ---
+    // LABELS & COLUMNS
     colName: "Nama Lengkap",
     fullName: "Nama Lengkap",
     colEmail: "Email",
@@ -176,7 +172,7 @@ const translations: Record<string, Record<string, string>> = {
     colScore: "Skor",
     yearOld: "Tahun",
     
-    // --- VALUES & OPTIONS ---
+    // VALUES & OPTIONS
     single: "Lajang",
     married: "Menikah",
     divorced: "Cerai",
@@ -215,7 +211,7 @@ const translations: Record<string, Record<string, string>> = {
   },
   
   en: {
-    // --- GLOBAL ---
+    // GLOBAL
     loading: "Loading...",
     error: "Error occurred",
     fetchError: "Failed to fetch data",
@@ -238,7 +234,7 @@ const translations: Record<string, Record<string, string>> = {
     processing: "Processing...",
     footerRights: "© 2024 Bank Sales Dashboard. All rights reserved.",
     
-    // --- LOGIN ---
+    // LOGIN
     loginTitle: "Login to Dashboard",
     loginDesc: "Enter credentials to access",
     loginBtn: "Login",
@@ -247,7 +243,7 @@ const translations: Record<string, Record<string, string>> = {
     welcomeBack: "Welcome Back",
     demoCreds: "Demo Account:",
     
-    // --- DASHBOARD & METRICS ---
+    // DASHBOARD & METRICS
     dashTitle: "Sales Dashboard",
     dashSubtitle: "Predictive Lead Scoring System",
     logout: "Logout",
@@ -263,7 +259,7 @@ const translations: Record<string, Record<string, string>> = {
     contacted: "Contacted",
     contactedDesc: "of total leads",
     
-    // --- FILTERS & TABLES ---
+    // FILTERS & TABLES
     searchPlaceholder: "Search...",
     filterStatus: "Filter Status",
     allStatus: "All Status",
@@ -281,7 +277,7 @@ const translations: Record<string, Record<string, string>> = {
     next: "Next",
     btnCall: "Call",
     
-    // --- DETAIL PAGE SPECIFIC ---
+    // DETAIL PAGE SPECIFIC
     detailCustomer: "Customer Detail",
     detailSubtitle: "Complete info & ML score",
     customerProfile: "Customer Profile",
@@ -301,7 +297,7 @@ const translations: Record<string, Record<string, string>> = {
     convertedSuccess: "Customer Converted",
     rejectedFail: "Customer Rejected",
     
-    // --- ADMIN PAGES ---
+    // ADMIN PAGES
     managementPageTitle: "Customer Management",
     managementPageDesc: "Manage profiles, finance, and history.",
     customerList: "Customer List",
@@ -325,7 +321,7 @@ const translations: Record<string, Record<string, string>> = {
     leadsHistory: "Leads History",
     noLeadsHistory: "No history yet.",
 
-    // --- ALERTS ---
+    // ALERTS
     confirmChange: "Change Status?",
     confirmChangeDesc: "Sure to change status to",
     yesChange: "Yes, Change",
@@ -348,7 +344,7 @@ const translations: Record<string, Record<string, string>> = {
     userUpdated: "User updated",
     userDeleted: "User deleted",
 
-    // --- LABELS & COLUMNS ---
+    // LABELS & COLUMNS
     colName: "Full Name",
     fullName: "Full Name",
     colEmail: "Email",
@@ -372,7 +368,7 @@ const translations: Record<string, Record<string, string>> = {
     colScore: "Score",
     yearOld: "Years",
     
-    // --- VALUES & OPTIONS ---
+    // VALUES & OPTIONS
     single: "Single",
     married: "Married",
     divorced: "Divorced",
@@ -463,4 +459,5 @@ export const useThemeLanguage = () => {
     throw new Error('useThemeLanguage must be used within a ThemeLanguageProvider');
   }
   return context;
+
 };
