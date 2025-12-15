@@ -1,4 +1,3 @@
-// ./components/ModalPortal.tsx
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -14,7 +13,6 @@ export function ModalPortal({ children }: { children: React.ReactNode }) {
     const container = containerRef.current!;
     document.body.appendChild(container);
 
-    // inline styles agar tak terganggu CSS lain
     container.style.position = 'fixed';
     container.style.top = '0';
     container.style.left = '0';
@@ -33,3 +31,4 @@ export function ModalPortal({ children }: { children: React.ReactNode }) {
 
   return createPortal(children, containerRef.current);
 }
+
