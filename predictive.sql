@@ -36,7 +36,7 @@ CREATE TABLE "public"."hasil_perhitungan_probabilitas" (
 )
 ;
 
--- Table  for nasabah-
+-- Table  for nasabah
 DROP TABLE IF EXISTS "public"."nasabah";
 CREATE TABLE "public"."nasabah" (
   "nasabah_id" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
@@ -664,4 +664,5 @@ CREATE TABLE IF NOT EXISTS nasabah_sales_log (
     
     CONSTRAINT fk_nasabah_log FOREIGN KEY (nasabah_id) REFERENCES nasabah(nasabah_id) ON DELETE CASCADE,
     CONSTRAINT fk_user_log FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+
 );
