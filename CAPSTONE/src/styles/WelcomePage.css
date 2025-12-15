@@ -1,8 +1,6 @@
-/* src/pages/WelcomePage.css */
-
 :root {
-  --primary-color: #1e40af; /* Biru Bank Gelap */
-  --accent-color: #3b82f6;  /* Biru Terang */
+  --primary-color: #1e40af;
+  --accent-color: #3b82f6;
   --text-dark: #1f2937;
   --text-light: #6b7280;
   --bg-light: #f3f4f6;
@@ -16,7 +14,7 @@
   overflow-x: hidden;
 }
 
-/* --- HERO SECTION --- */
+/* HERO SECTION */
 .hero-section {
   background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
   color: var(--white);
@@ -60,7 +58,7 @@
   box-shadow: 0 10px 15px rgba(0,0,0,0.2);
 }
 
-/* --- FEATURES SECTION --- */
+/* FEATURES SECTION */
 .features-section {
   padding: 80px 20px;
   background-color: var(--white);
@@ -110,7 +108,7 @@
   font-size: 1.25rem;
 }
 
-/* --- HOW TO USE SECTION --- */
+/* HOW TO USE SECTION */
 .guide-section {
   padding: 80px 20px;
   background-color: var(--bg-light);
@@ -149,7 +147,7 @@
   flex-shrink: 0;
 }
 
-/* --- ABOUT SECTION --- */
+/* ABOUT SECTION */
 .about-section {
   padding: 80px 20px;
   text-align: center;
@@ -163,7 +161,7 @@
   color: var(--text-light);
 }
 
-/* --- FOOTER --- */
+/* FOOTER */
 .footer {
   background-color: #111827;
   color: #9ca3af;
@@ -177,4 +175,5 @@
   .hero-content h1 { font-size: 2rem; }
   .features-grid { flex-direction: column; align-items: center; }
   .feature-card { width: 100%; max-width: 350px; }
+
 }
