@@ -1,8 +1,5 @@
-// src/pages/WelcomePage.tsx
-
 import React from 'react';
 
-// 1. Definisikan tipe Props yang diterima komponen ini
 interface WelcomePageProps {
   onNavigateToLogin: () => void;
 }
@@ -11,7 +8,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800 overflow-x-hidden">
       
-      {/* ================= HERO SECTION ================= */}
+      {/* HERO SECTION */}
       <section className="relative bg-gradient-to-br from-blue-800 to-blue-900 text-white py-24 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
@@ -29,15 +26,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
             Masuk ke Portal
           </button>
         </div>
-        
-        {/* Dekorasi Background (Opsional) */}
+
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-10">
            <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl"></div>
            <div className="absolute top-1/2 right-0 w-64 h-64 bg-blue-400 rounded-full blur-3xl"></div>
         </div>
       </section>
 
-      {/* ================= FITUR UTAMA ================= */}
+      {/* FITUR UTAMA */}
       <section className="py-20 px-6 bg-white relative z-10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-blue-900 mb-12">
@@ -64,7 +60,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
         </div>
       </section>
 
-      {/* ================= TATA CARA PENGGUNAAN ================= */}
+      {/* TATA CARA PENGGUNAAN */}
       <section className="py-20 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-blue-900 mb-12">
@@ -91,7 +87,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
         </div>
       </section>
 
-      {/* ================= ABOUT US ================= */}
+      {/* ABOUT US */}
       <section className="py-20 px-6 bg-white text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-blue-900 mb-8">Tentang Kami</h2>
@@ -103,13 +99,13 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
               untuk memprediksi perilaku nasabah secara akurat.
             </p>
             <p className="font-semibold text-gray-800 pt-4">
-              Developed by Setya Adjie & Team
+              Developed by Team [A25-CS077]
             </p>
           </div>
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800">
         <p>&copy; {new Date().getFullYear()} Banking Sales Portal. All rights reserved.</p>
       </footer>
@@ -117,9 +113,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onNavigateToLogin }) => {
   );
 };
 
-// =================================================================
-// SUB-COMPONENTS (Agar kode lebih rapi dan modular dalam satu file)
-// =================================================================
 
 interface FeatureCardProps {
   icon: string;
@@ -162,5 +155,6 @@ const StepItem: React.FC<StepItemProps> = ({ number, title, desc }) => {
     </div>
   );
 };
+
 
 export default WelcomePage;
