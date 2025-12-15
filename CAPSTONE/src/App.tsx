@@ -1,10 +1,6 @@
-// src/App.tsx
 
 import React, { useState } from 'react';
-
-// ===================== IMPORTS =====================
-// Pastikan path import ini sesuai dengan struktur folder Anda
-import WelcomePage from './components/WelcomePage'; // Sesuaikan path jika file ada di folder lain
+import WelcomePage from './components/WelcomePage';
 import { LoginPage } from './components/LoginPage';
 import { DashboardPage } from './components/DashboardPage';
 import { DetailPage } from './components/DetailPage';
@@ -14,7 +10,7 @@ import { SalesPerformancePage } from './components/SalesPerformancePage';
 import { ThemeLanguageProvider } from './contexts/ThemeLanguageContext';
 import { SettingsToggle } from './components/SettingsToggle';
 
-// ===================== INTERFACES =====================
+// INTERFACES
 export interface Lead {
   id: string;
   name: string;
@@ -45,26 +41,20 @@ export interface User {
   role: string;
 }
 
-// 1. DEFINISI TIPE HALAMAN
-// Menambahkan 'welcome' sebagai salah satu opsi halaman
 type Page = 'welcome' | 'login' | 'dashboard' | 'detail' | 'admin' | 'adminUsers' | 'salesPerf';
 
 function AppContent() {
-  // 2. DEFAULT STATE
-  // Set default ke 'welcome' agar halaman ini muncul pertama kali saat aplikasi dibuka
   const [currentPage, setCurrentPage] = useState<Page>('welcome');
   
   const [user, setUser] = useState<User | null>(null);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
-  // ===================== HANDLERS (NAVIGASI) =====================
-
-  // Dari Welcome Page -> Masuk ke Login Page
+  // HANDLERS (NAVIGASI)
   const handleNavigateToLogin = () => {
     setCurrentPage('login');
   };
 
-  // Dari Login Page -> Kembali ke Welcome Page (Tombol Back)
+  // Tombol Back
   const handleBackToWelcome = () => {
     setCurrentPage('welcome');
   };
@@ -108,7 +98,7 @@ function AppContent() {
     setCurrentPage('salesPerf');
   };
 
-  // ===================== RENDER UTAMA =====================
+  // RENDER UTAMA
   return (
     <>
       {/* Tombol Pengaturan Tema & Bahasa (Muncul di semua halaman) */}
@@ -117,20 +107,20 @@ function AppContent() {
       {/* Container Utama dengan Background Responsif Dark Mode */}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         
-        {/* 1. HALAMAN WELCOME */}
+        {/* HALAMAN WELCOME */}
         {currentPage === 'welcome' && (
           <WelcomePage onNavigateToLogin={handleNavigateToLogin} />
         )}
 
-        {/* 2. HALAMAN LOGIN */}
+        {/* HALAMAN LOGIN */}
         {currentPage === 'login' && (
           <LoginPage 
             onLogin={handleLogin} 
-            onBack={handleBackToWelcome} // <-- Props penting untuk tombol kembali
+            onBack={handleBackToWelcome} 
           />
         )}
         
-        {/* 3. HALAMAN DASHBOARD */}
+        {/* HALAMAN DASHBOARD */}
         {currentPage === 'dashboard' && user && (
           <DashboardPage 
             user={user}
@@ -142,7 +132,7 @@ function AppContent() {
           />
         )}
         
-        {/* 4. HALAMAN DETAIL LEAD */}
+        {/* HALAMAN DETAIL LEAD */}
         {currentPage === 'detail' && user && selectedLeadId && (
           <DetailPage 
             leadId={selectedLeadId}
@@ -151,7 +141,7 @@ function AppContent() {
           />
         )}
 
-        {/* 5. HALAMAN ADMIN MANAGE LEADS */}
+        {/* HALAMAN ADMIN MANAGE LEADS */}
         {currentPage === 'admin' && user && (
           <AdminManagementPage 
             user={user}
@@ -159,7 +149,7 @@ function AppContent() {
           />
         )}
         
-        {/* 6. HALAMAN ADMIN MANAGE USERS */}
+        {/* HALAMAN ADMIN MANAGE USERS */}
         {currentPage === 'adminUsers' && user && (
           <AdminUserPage
             user={user}
@@ -168,7 +158,7 @@ function AppContent() {
           />
         )}
 
-        {/* 7. HALAMAN SALES PERFORMANCE */}
+        {/* HALAMAN SALES PERFORMANCE */}
         {currentPage === 'salesPerf' && user && (
           <SalesPerformancePage
             user={user}
@@ -181,7 +171,6 @@ function AppContent() {
   );
 }
 
-// Export default App yang membungkus AppContent dengan Provider Context
 export default function App() {
   return (
     <ThemeLanguageProvider>
