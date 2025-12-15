@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Phone, CheckCircle2, XCircle, Clock, TrendingUp, Briefcase, GraduationCap, Calendar, DollarSign } from 'lucide-react';
 import type { Lead } from '../App';
-import { useThemeLanguage } from '../contexts/ThemeLanguageContext'; // Import
+import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
 interface LeadsListProps {
   leads: Lead[];
@@ -12,7 +12,7 @@ interface LeadsListProps {
 }
 
 export function LeadsList({ leads, onStatusChange }: LeadsListProps) {
-  const { t } = useThemeLanguage(); // Hook
+  const { t } = useThemeLanguage();
 
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-300';
@@ -77,7 +77,7 @@ export function LeadsList({ leads, onStatusChange }: LeadsListProps) {
         {leads.map((lead, index) => (
           <Card key={lead.id} className="hover:shadow-md transition-shadow dark:bg-slate-800 dark:border-slate-700">
             <CardContent className="p-5">
-              {/* ... (Isi card sama seperti sebelumnya, sesuaikan warna text untuk dark mode) ... */}
+              {}
               <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                  {/* Priority Badge */}
                  <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export function LeadsList({ leads, onStatusChange }: LeadsListProps) {
                     </div>
                   </div>
 
-                  {/* ... Sisa struktur UI sama, tambahkan dark:text-slate-400 dll ... */}
+                  {}
                    <div className="space-y-1">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                       <DollarSign className="w-4 h-4" />
@@ -144,7 +144,7 @@ export function LeadsList({ leads, onStatusChange }: LeadsListProps) {
                       {t('btnCall')}
                     </Button>
                   )}
-                  {/* ... (Button status lainnya disesuaikan dengan t() dan dark mode) ... */}
+                  {}
                  </div>
               </div>
             </CardContent>
