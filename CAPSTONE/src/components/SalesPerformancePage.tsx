@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { RefreshCw, ArrowLeft, Eye, Search, Filter } from 'lucide-react';
 import type { User, Lead } from '../App';
-import { useThemeLanguage } from '../contexts/ThemeLanguageContext'; // [1] Import Hook
+import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
 const API_URL = 'https://eksperimen-deploy-delta.vercel.app/api';
 const PAGE_SIZE = 20;
@@ -17,7 +17,7 @@ interface SalesPerformancePageProps {
 }
 
 export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerformancePageProps) {
-  const { t, language } = useThemeLanguage(); // [2] Gunakan Hook
+  const { t, language } = useThemeLanguage();
   
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filtered, setFiltered] = useState<Lead[]>([]);
@@ -30,7 +30,6 @@ export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerfor
 
   useEffect(() => {
     fetchMyLeads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchMyLeads = async () => {
@@ -57,7 +56,7 @@ export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerfor
   // derived metrics
   const totalHandled = leads.length;
   const converted = leads.filter(l => l.status === 'converted').length;
-  const contacted = leads.length; // Asumsi history mencatat semua yg disentuh
+  const contacted = leads.length;
   const conversionRate = contacted > 0 ? (converted / contacted) * 100 : 0;
 
   // search & filter
@@ -325,5 +324,6 @@ export function SalesPerformancePage({ user, onBack, onViewDetail }: SalesPerfor
   );
 
 }
+
 
 
