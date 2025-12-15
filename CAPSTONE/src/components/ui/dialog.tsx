@@ -1,10 +1,7 @@
 "use client";
 
 import * as React from "react";
-// PERBAIKAN: Hapus @1.1.6 di belakang nama paket
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-// PERBAIKAN: Hapus @0.487.0 di belakang nama paket, dan gunakan X (bukan XIcon jika versi terbaru)
-// Note: Lucide versi baru sering menggunakan 'X' bukan 'XIcon', tapi jika error coba kembalikan ke XIcon
 import { X } from "lucide-react"; 
 
 import { cn } from "./utils";
@@ -33,7 +30,6 @@ function DialogClose({
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
-// Menggunakan forwardRef agar ref diteruskan dengan benar
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -43,7 +39,6 @@ const DialogOverlay = React.forwardRef<
       ref={ref}
       data-slot="dialog-overlay"
       className={cn(
-        // Z-Index 100 agar di atas elemen lain
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-[100] bg-black/50",
         className,
       )}
@@ -64,8 +59,6 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // Z-Index 101 agar di atas Overlay
-          // Menggunakan class standar tailwind untuk centering (fixed top-1/2 left-1/2 -translate...)
           "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-[101] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
           className,
         )}
