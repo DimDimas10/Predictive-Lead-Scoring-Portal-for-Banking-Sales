@@ -1,4 +1,3 @@
-// src/components/SettingsToggle.tsx
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
@@ -8,13 +7,9 @@ export function SettingsToggle() {
   const { theme, toggleTheme, language, setLanguage } = useThemeLanguage();
 
   return (
-    // POSISI: fixed bottom-4 right-4 (Pojok Kanan Bawah)
-    // Z-INDEX: z-50 agar selalu di atas elemen lain
     <div className="fixed bottom-4 right-4 z-50 flex gap-2 items-center">
       
-      {/* CONTAINER BAHASA 
-        Background berubah: bg-white (Light) -> dark:bg-slate-800 (Dark)
-      */}
+      {/* CONTAINER BAHASA */}
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 flex transition-colors duration-300">
         <Button 
           variant="ghost" 
@@ -42,9 +37,7 @@ export function SettingsToggle() {
         </Button>
       </div>
 
-      {/* TOMBOL TEMA 
-        Background berubah: bg-white (Light) -> dark:bg-slate-800 (Dark)
-      */}
+      {/* TOMBOL TEMA */}
       <Button
         variant="outline"
         size="icon"
@@ -60,4 +53,5 @@ export function SettingsToggle() {
       </Button>
     </div>
   );
+
 }
