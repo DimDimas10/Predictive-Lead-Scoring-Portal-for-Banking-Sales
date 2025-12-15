@@ -4,7 +4,6 @@
 
 @layer base {
   :root {
-    /* --- COLOR PALETTE ASLI PROJECT ANDA (LIGHT MODE) --- */
     --background: #ffffff;
     --foreground: oklch(0.145 0 0);
     
@@ -29,7 +28,7 @@
     --destructive: #d4183d;
     --destructive-foreground: #ffffff;
     
-    --border: rgba(0, 0, 0, 0.1); /* #0000001a */
+    --border: rgba(0, 0, 0, 0.1);
     --input: transparent;
     --input-background: #f3f3f5;
     
@@ -55,7 +54,6 @@
   }
 
   .dark {
-    /* --- COLOR PALETTE ASLI PROJECT ANDA (DARK MODE) --- */
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     
@@ -115,20 +113,17 @@
   }
 }
 
-/* ================================================================= */
-/* MANUAL FIX: PAKSA TOMBOL SETTINGS KE KANAN BAWAH                  */
-/* ================================================================= */
 
 .fixed {
   position: fixed !important;
 }
 
 .bottom-6 {
-  bottom: 1.5rem !important; /* 24px */
+  bottom: 1.5rem !important;
 }
 
 .right-6 {
-  right: 1.5rem !important; /* 24px */
+  right: 1.5rem !important;
 }
 
 .z-\[50\] {
@@ -139,7 +134,6 @@
   z-index: 9999 !important;
 }
 
-/* Fix untuk Modal/Dialog agar selalu di layer paling atas */
 [data-radix-portal], .radix-portal, [data-portal], .select-portal {
   z-index: 2000 !important;
 }
