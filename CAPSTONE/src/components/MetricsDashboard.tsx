@@ -2,14 +2,14 @@ import React from 'react';
 import { TrendingUp, Users, Phone, DollarSign, Target, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import type { Lead } from '../App';
-import { useThemeLanguage } from '../contexts/ThemeLanguageContext'; // Import
+import { useThemeLanguage } from '../contexts/ThemeLanguageContext';
 
 interface MetricsDashboardProps {
   leads: Lead[];
 }
 
 export function MetricsDashboard({ leads }: MetricsDashboardProps) {
-  const { t } = useThemeLanguage(); // Hook
+  const { t } = useThemeLanguage();
   
   const totalLeads = leads.length;
   const contacted = leads.filter(l => l.status === 'contacted' || l.status === 'converted' || l.status === 'rejected').length;
