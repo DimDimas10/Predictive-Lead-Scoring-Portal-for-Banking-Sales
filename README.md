@@ -10,7 +10,7 @@ Aplikasi ini dikembangkan sebagai bagian dari **Capstone Project (Dicoding x Acc
 Sistem Predictive Lead Scoring Portal for Banking Sales terdiri dari:
 
 1. **Model Machine Learning**  
-   Digunakan untuk memproses data nasabah, melakukan preprocessing, menghitung skor probabilitas, dan menyimpan hasil prediksi ke database.
+   Digunakan untuk memproses data nasabah, melakukan preprocessing, menghitung skor probabilitas, dan menyimpan hasil prediksi ke database. Link Model: https://drive.google.com/file/d/1-GaNSzSqK3LhAhtbhEWL-3BaiLZ-LFyA/view?usp=sharing
 
 2. **Backend API**  
    Menghubungkan aplikasi dengan database serta menangani proses penyimpanan dan pengelolaan data.
